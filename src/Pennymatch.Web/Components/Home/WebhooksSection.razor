@@ -1,0 +1,16 @@
+<section class="section" aria-labelledby="webhooks-title">
+    <div class="container split">
+        <div>
+            <SectionHeading Id="webhooks-title"
+                            Kicker="Webhooks"
+                            Title="Eventos financieros con entrega sin duplicados"
+                            Lead="Firma HMAC, reintentos con backoff e idempotencia en el receptor para que payment.succeeded sea seguro de reenviar." />
+            <p>
+                Pennymatch emite eventos de ledger y pagos con identificadores estables. Tu API puede responder rápido y procesar en cola sin miedo a cobros dobles.
+            </p>
+        </div>
+        <div class="journal-flash">
+            <JsonPayloadMock Filename="evt_payment.succeeded.json" Json="@WebhookSamples.PaymentSucceeded" />
+        </div>
+    </div>
+</section>

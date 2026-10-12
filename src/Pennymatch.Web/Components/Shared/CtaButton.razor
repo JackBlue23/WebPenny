@@ -1,0 +1,22 @@
+@if (string.IsNullOrWhiteSpace(Href))
+{
+    <button type="@Type" class="@CssClass" @attributes="AdditionalAttributes">@ChildContent</button>
+}
+else
+{
+    <a href="@Href" class="@CssClass" target="@Target" rel="@Rel" @attributes="AdditionalAttributes">@ChildContent</a>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string Variant { get; set; } = "primary";
+    [Parameter] public string Size { get; set; } = "md";
+    [Parameter] public string Type { get; set; } = "button";
+    [Parameter] public string? Target { get; set; }
+    [Parameter] public string? Rel { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass =>
+        $"btn btn-{Variant}" + (Size == "lg" ? " btn-lg" : string.Empty);
+}

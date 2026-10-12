@@ -1,0 +1,33 @@
+@inject AuthLinkService Auth
+
+<section class="hero" aria-labelledby="hero-brand">
+    <div class="container hero-grid">
+        <div>
+            <h1 id="hero-brand" class="hero-brand">Pennymatch</h1>
+            <p class="hero-title">Automatiza el ledger de tu producto financiero</p>
+            <p class="hero-lead">
+                Partida doble, webhooks confiables y aislamiento multi-tenant para equipos que construyen pagos, wallets y liquidaciones B2B.
+            </p>
+            <div class="hero-actions">
+                <CtaButton Href="@Auth.DemoUrl"
+                           Variant="primary"
+                           Size="lg"
+                           Target="@(Auth.DemoOpensExternally ? "_blank" : null)"
+                           Rel="@(Auth.DemoOpensExternally ? "noopener noreferrer" : null)">
+                    Solicitar Demo
+                </CtaButton>
+                <CtaButton Href="/#caracteristicas" Variant="secondary" Size="lg">
+                    Ver núcleo técnico
+                </CtaButton>
+            </div>
+        </div>
+        <div class="hero-visual fintech-card-texture journal-flash" role="img" aria-label="Vista abstracta de un ledger de partida doble en tiempo real">
+            <div class="hero-ledger">
+                <div><span class="debit">DR</span> cash··············· <span class="bal">1.299,00 EUR</span></div>
+                <div><span class="credit">CR</span> revenue_fees······· <span class="bal">1.299,00 EUR</span></div>
+                <div style="margin-top:0.85rem;opacity:0.75;">entry_id · je_88af · <span class="ok">balanced ✓</span></div>
+                <div style="opacity:0.75;">tenant · tn_acme · idempotent</div>
+            </div>
+        </div>
+    </div>
+</section>

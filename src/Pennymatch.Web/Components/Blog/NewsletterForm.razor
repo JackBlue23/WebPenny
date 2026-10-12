@@ -1,0 +1,53 @@
+<div class="newsletter">
+    <h2>Newsletter</h2>
+    <p style="font-size:var(--pm-text-sm);margin-bottom:0.75rem;">
+        Recibe guías de ledger, webhooks y seguridad multi-tenant. Sin spam.
+    </p>
+
+    @if (Submitted)
+    {
+        <p class="newsletter-msg" role="status">Gracias. Te avisaremos cuando publiquemos el próximo artículo.</p>
+    }
+    else
+    {
+        <form method="post" @formname="newsletter" data-enhance>
+            <AntiforgeryToken />
+            <label class="sr-only" for="newsletter-email">Email</label>
+            <input id="newsletter-email"
+                   class="@(Invalid ? "invalid" : null)"
+                   name="email"
+                   type="email"
+                   value="@Email"
+                   placeholder="tu@empresa.com"
+                   required />
+            @if (Invalid)
+            {
+                <p class="validation-message">Introduce un email válido.</p>
+            }
+            <button type="submit" class="btn btn-primary">Suscribirme</button>
+        </form>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromForm(FormName = "newsletter")]
+    private string? Email { get; set; }
+
+    private bool Submitted { get; set; }
+    private bool Invalid { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Email is null)
+        {
+            return;
+        }
+
+        Invalid = string.IsNullOrWhiteSpace(Email) || !Email.Contains('@');
+        if (!Invalid)
+        {
+            // Marketing-site capture only — wire to ESP later.
+            Submitted = true;
+        }
+    }
+}

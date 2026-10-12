@@ -1,0 +1,125 @@
+@inject AuthLinkService Auth
+
+<section class="section" id="precios" aria-labelledby="pricing-title">
+    <div class="container">
+        <SectionHeading Kicker="Precios"
+                        Title="Planes para equipos que mueven valor"
+                        Lead="Empieza con el ledger esencial y escala a enterprise con SLA, SSO y soporte dedicado." />
+
+        <div class="pricing-grid">
+            @foreach (var plan in Plans)
+            {
+                var href = plan.Highlighted ? Auth.RegisterUrl : Auth.DemoUrl;
+                var external = plan.Highlighted || Auth.DemoOpensExternally;
+                <article class="plan fintech-card-texture @(plan.Highlighted ? "featured" : null)">
+                    <h3 class="plan-name">@plan.Name</h3>
+                    <p class="plan-price">@plan.PriceLabel <span>@plan.Cadence</span></p>
+                    <p>@plan.Summary</p>
+                    <ul class="plan-features">
+                        @foreach (var feature in plan.Features)
+                        {
+                            <li>@feature</li>
+                        }
+                    </ul>
+                    <CtaButton Href="@href"
+                               Variant="@(plan.Highlighted ? "primary" : "secondary")"
+                               Target="@(external ? "_blank" : null)"
+                               Rel="@(external ? "noopener noreferrer" : null)">
+                        @plan.CtaLabel
+                    </CtaButton>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section" id="demo" aria-labelledby="demo-title">
+    <div class="container section-panel fintech-card-texture">
+        <SectionHeading Id="demo-title"
+                        Kicker="Demo"
+                        Title="Solicita una demo del ledger en tu stack"
+                        Lead="Cuéntanos tu caso de pagos o liquidaciones. Ajustaremos ProductBaseUrl al puerto real de Pennymatch.Client cuando lo confirméis." />
+        <div class="hero-actions">
+            <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
+                Crear cuenta
+            </CtaButton>
+            <CtaButton Href="mailto:demo@pennymatch.com?subject=Solicitar%20demo%20Pennymatch" Variant="secondary">
+                Escribir a ventas
+            </CtaButton>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="docs" aria-labelledby="docs-title">
+    <div class="container">
+        <SectionHeading Kicker="Docs"
+                        Title="Documentación orientada a integración"
+                        Lead="@($"Guías de ledger, webhooks firmados y modelos de autorización. El detalle de endpoints vive en tu entorno de producto. API local: {Auth.ApiBaseUrl}")" />
+        <div class="hero-actions">
+            <CtaButton Href="/blog" Variant="secondary">Leer el blog técnico</CtaButton>
+            <CtaButton Href="@Auth.DemoUrl"
+                       Variant="primary"
+                       Target="@(Auth.DemoOpensExternally ? "_blank" : null)"
+                       Rel="@(Auth.DemoOpensExternally ? "noopener noreferrer" : null)">
+                Hablar con ventas
+            </CtaButton>
+        </div>
+    </div>
+</section>
+
+@code {
+    private static readonly IReadOnlyList<PricingPlan> Plans =
+    [
+        new()
+        {
+            Id = "starter",
+            Name = "Starter",
+            PriceLabel = "€0",
+            Cadence = "/ mes en sandbox",
+            Summary = "Para prototipar asientos y webhooks en desarrollo.",
+            Features =
+            [
+                "Ledger sandbox",
+                "Hasta 2 tenants de prueba",
+                "Webhooks firmados",
+                "Soporte por comunidad"
+            ],
+            CtaLabel = "Solicitar acceso",
+            Highlighted = false
+        },
+        new()
+        {
+            Id = "pro",
+            Name = "Pro",
+            PriceLabel = "€499",
+            Cadence = "/ mes",
+            Summary = "Producción para fintechs en crecimiento.",
+            Features =
+            [
+                "Ledger en producción",
+                "Tenants ilimitados",
+                "RBAC + auditoría",
+                "SLA 99,9%"
+            ],
+            CtaLabel = "Registrarse",
+            Highlighted = true
+        },
+        new()
+        {
+            Id = "enterprise",
+            Name = "Enterprise",
+            PriceLabel = "A medida",
+            Cadence = "",
+            Summary = "Despliegues exigentes con compliance y soporte 24/7.",
+            Features =
+            [
+                "SSO / SAML",
+                "Residencia de datos",
+                "Soporte dedicado",
+                "Contrato y DPA"
+            ],
+            CtaLabel = "Hablar con ventas",
+            Highlighted = false
+        }
+    ];
+}

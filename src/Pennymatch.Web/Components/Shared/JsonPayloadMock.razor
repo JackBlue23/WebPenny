@@ -1,0 +1,39 @@
+<div class="json-mock" aria-hidden="false">
+    <div class="json-mock-header">
+        <span class="json-mock-dot"></span>
+        <span class="json-mock-dot"></span>
+        <span class="json-mock-dot"></span>
+        <span>@Filename</span>
+    </div>
+    <pre><code>@((MarkupString)Highlighted)</code></pre>
+</div>
+
+@code {
+    [Parameter] public string Filename { get; set; } = "webhook.json";
+    [Parameter] public string Json { get; set; } = "{}";
+
+    private string Highlighted => Highlight(Json);
+
+    private static string Highlight(string json)
+    {
+        // Lightweight highlight for demo payloads (not a full JSON highlighter).
+        var escaped = System.Net.WebUtility.HtmlEncode(json);
+        escaped = System.Text.RegularExpressions.Regex.Replace(
+            escaped,
+            "&quot;([^&]+)&quot;(?=\\s*:)",
+            "<span class=\"json-key\">&quot;$1&quot;</span>");
+        escaped = System.Text.RegularExpressions.Regex.Replace(
+            escaped,
+            ":\\s*&quot;([^&]*)&quot;",
+            ": <span class=\"json-str\">&quot;$1&quot;</span>");
+        escaped = System.Text.RegularExpressions.Regex.Replace(
+            escaped,
+            ":\\s*(-?\\d+(?:\\.\\d+)?)",
+            ": <span class=\"json-num\">$1</span>");
+        escaped = System.Text.RegularExpressions.Regex.Replace(
+            escaped,
+            ":\\s*(true|false|null)",
+            ": <span class=\"json-bool\">$1</span>");
+        return escaped;
+    }
+}

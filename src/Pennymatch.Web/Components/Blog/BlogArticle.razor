@@ -1,0 +1,60 @@
+@page "/blog/{Slug}"
+@inject BlogContentService Blog
+@inject NavigationManager Nav
+
+@if (_post is null)
+{
+    <PageTitle>Artículo no encontrado — Pennymatch</PageTitle>
+    <section class="page-hero">
+        <div class="container">
+            <h1>Artículo no encontrado</h1>
+            <p class="section-lead">El slug <code>@Slug</code> no existe. Vuelve al <a href="/blog">blog</a>.</p>
+        </div>
+    </section>
+}
+else
+{
+    <PageTitle>@_post.Title — Pennymatch</PageTitle>
+    <HeadContent>
+        <meta name="description" content="@_post.Description" />
+        <meta name="author" content="@_post.Author" />
+        <meta property="og:title" content="@_post.Title" />
+        <meta property="og:description" content="@_post.Description" />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content="@Nav.ToAbsoluteUri($"/blog/{_post.Slug}")" />
+        <meta property="article:published_time" content="@_post.PublishedAt.ToString("yyyy-MM-dd")" />
+        <link rel="canonical" href="@Nav.ToAbsoluteUri($"/blog/{_post.Slug}")" />
+    </HeadContent>
+
+    <article class="container article-layout">
+        <div>
+            <header class="article-header">
+                <div class="blog-meta">
+                    <span>@_post.Category</span>
+                    <time datetime="@_post.PublishedAt.ToString("yyyy-MM-dd")">@_post.PublishedAt.ToString("d MMM yyyy")</time>
+                    <span>@_post.ReadingMinutes min de lectura</span>
+                    <span>@_post.Author</span>
+                </div>
+                <h1>@_post.Title</h1>
+                <p class="section-lead">@_post.Description</p>
+            </header>
+            <div class="prose">
+                @((MarkupString)_post.Html)
+            </div>
+        </div>
+        <BlogSidebar Posts="_recommended" />
+    </article>
+}
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private BlogPost? _post;
+    private IReadOnlyList<BlogPost> _recommended = [];
+
+    protected override void OnParametersSet()
+    {
+        _post = Blog.GetBySlug(Slug);
+        _recommended = Blog.GetRecommended(Slug);
+    }
+}

@@ -1,0 +1,35 @@
+@inject AuthLinkService Auth
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <a class="nav-brand" href="/">
+                    <span class="nav-logo-mark" aria-hidden="true">P</span>
+                    <span>Pennymatch</span>
+                </a>
+                <p style="margin-top:0.85rem;max-width:28ch;">
+                    Ledger API de partida doble, webhooks financieros y seguridad multi-tenant para productos B2B.
+                </p>
+            </div>
+            <div>
+                <h2>Producto</h2>
+                <ul>
+                    <li><a href="/#caracteristicas">Características</a></li>
+                    <li><a href="/#precios">Precios</a></li>
+                    <li><a href="/#docs">Docs</a></li>
+                    <li><a href="@Auth.DemoUrl">Solicitar demo</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>Recursos</h2>
+                <ul>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="@Auth.LoginUrl" target="_blank" rel="noopener noreferrer">Iniciar sesión</a></li>
+                    <li><a href="@Auth.RegisterUrl" target="_blank" rel="noopener noreferrer">Registrarse</a></li>
+                </ul>
+            </div>
+        </div>
+        <p class="footer-copy">© @DateTime.UtcNow.Year Pennymatch. Todos los derechos reservados.</p>
+    </div>
+</footer>

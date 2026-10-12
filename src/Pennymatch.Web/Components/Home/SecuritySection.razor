@@ -1,0 +1,33 @@
+<section class="section section-dark" aria-labelledby="security-title">
+    <div class="container split reverse">
+        <div>
+            <SectionHeading Dark="true"
+                            Kicker="Seguridad"
+                            Title="RBAC, TenantId y tokens cifrados"
+                            Lead="Aislamiento mecánico entre clientes B2B: cada dato conoce su tenant, cada mutación exige un permiso, cada secreto vive cifrado." />
+        </div>
+        <ul class="security-list fintech-card-texture">
+            <li class="security-item reveal">
+                <span class="security-icon integrity-blink" aria-hidden="true">RB</span>
+                <div>
+                    <h3>RBAC accionable</h3>
+                    <p>Permisos como <code>ledger.entries:post</code> y <code>webhooks:manage</code>, evaluados dentro del tenant activo.</p>
+                </div>
+            </li>
+            <li class="security-item reveal reveal-delay-1">
+                <span class="security-icon" aria-hidden="true">TN</span>
+                <div>
+                    <h3>TenantId de punta a punta</h3>
+                    <p>Filtro obligatorio en repositorios, colas y JWT. Los tests de aislamiento esperan 404 entre tenants.</p>
+                </div>
+            </li>
+            <li class="security-item reveal reveal-delay-2">
+                <span class="security-icon" aria-hidden="true">ENC</span>
+                <div>
+                    <h3>Tokens cifrados en reposo</h3>
+                    <p>Secretos de webhook y API keys con envelope encryption, rotación por <code>kid</code> y exposición en claro una sola vez.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>

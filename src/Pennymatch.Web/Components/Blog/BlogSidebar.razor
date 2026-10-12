@@ -1,0 +1,21 @@
+<aside class="sidebar" aria-label="Contenido relacionado">
+    <div>
+        <h2>Recomendados</h2>
+        <ul class="sidebar-list">
+            @foreach (var post in Posts)
+            {
+                <li>
+                    <a href="@($"/blog/{post.Slug}")">
+                        @post.Title
+                        <span>@post.Category · @post.ReadingMinutes min</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+    <NewsletterForm />
+</aside>
+
+@code {
+    [Parameter] public IReadOnlyList<BlogPost> Posts { get; set; } = [];
+}

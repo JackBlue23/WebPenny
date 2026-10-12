@@ -1,0 +1,91 @@
+@inject AuthLinkService Auth
+@inject IHttpContextAccessor HttpContextAccessor
+
+<header class="site-header">
+    <div class="container">
+        <nav class="nav" aria-label="Principal">
+            <a class="nav-brand" href="/">
+                <span class="nav-logo-mark" aria-hidden="true">P</span>
+                <span>Pennymatch</span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a class="nav-link" href="/#caracteristicas">Características</a></li>
+                <li><a class="nav-link" href="/#precios">Precios</a></li>
+                <li><NavLink class="nav-link" href="/blog" ActiveClass="nav-link-active">Blog</NavLink></li>
+                <li><a class="nav-link" href="/#docs">Docs</a></li>
+            </ul>
+
+            <div class="nav-ctas">
+                <CtaButton Href="@Auth.DemoUrl"
+                           Variant="secondary"
+                           Target="@(Auth.DemoOpensExternally ? "_blank" : null)"
+                           Rel="@(Auth.DemoOpensExternally ? "noopener noreferrer" : null)">
+                    Solicitar Demo
+                </CtaButton>
+                @if (HasServerSession)
+                {
+                    <CtaButton Href="@Auth.ProductBaseUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer"
+                               data-auth-session="true">
+                        Ir al producto
+                    </CtaButton>
+                }
+                else
+                {
+                    <span data-auth-guest="true" style="display:inline-flex;gap:0.55rem;flex-wrap:wrap;">
+                        <CtaButton Href="@Auth.LoginUrl" Variant="secondary" Target="_blank" Rel="noopener noreferrer">
+                            Iniciar Sesión
+                        </CtaButton>
+                        <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
+                            Registrarse
+                        </CtaButton>
+                    </span>
+                    <CtaButton Href="@Auth.ProductBaseUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer"
+                               data-auth-session="true" hidden>
+                        Ir al producto
+                    </CtaButton>
+                }
+            </div>
+
+            <button type="button" class="nav-toggle" data-nav-toggle aria-expanded="false" aria-controls="nav-mobile">
+                <span class="sr-only">Abrir menú</span>
+                Menú
+            </button>
+        </nav>
+
+        <div id="nav-mobile" class="nav-mobile" data-nav-mobile>
+            <ul class="nav-links">
+                <li><a class="nav-link" href="/#caracteristicas">Características</a></li>
+                <li><a class="nav-link" href="/#precios">Precios</a></li>
+                <li><a class="nav-link" href="/blog">Blog</a></li>
+                <li><a class="nav-link" href="/#docs">Docs</a></li>
+            </ul>
+            <div class="nav-ctas">
+                <CtaButton Href="@Auth.DemoUrl" Variant="secondary">Solicitar Demo</CtaButton>
+                <CtaButton Href="@Auth.LoginUrl" Variant="secondary" Target="_blank" Rel="noopener noreferrer" data-auth-guest>
+                    Iniciar Sesión
+                </CtaButton>
+                <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer" data-auth-guest>
+                    Registrarse
+                </CtaButton>
+            </div>
+        </div>
+    </div>
+</header>
+
+@code {
+    private bool HasServerSession { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var name = Auth.SessionCookieName;
+        if (string.IsNullOrEmpty(name))
+        {
+            HasServerSession = false;
+            return;
+        }
+
+        var ctx = HttpContextAccessor.HttpContext;
+        HasServerSession = ctx?.Request.Cookies.ContainsKey(name) == true;
+    }
+}

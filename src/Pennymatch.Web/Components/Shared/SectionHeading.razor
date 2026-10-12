@@ -1,0 +1,19 @@
+<header class="section-heading">
+    @if (!string.IsNullOrWhiteSpace(Kicker))
+    {
+        <p class="section-kicker">@Kicker</p>
+    }
+    <h2 id="@Id">@Title</h2>
+    @if (!string.IsNullOrWhiteSpace(Lead))
+    {
+        <p class="section-lead">@Lead</p>
+    }
+</header>
+
+@code {
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public string? Kicker { get; set; }
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Lead { get; set; }
+    [Parameter] public bool Dark { get; set; }
+}

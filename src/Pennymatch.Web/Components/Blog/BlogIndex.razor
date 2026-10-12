@@ -1,0 +1,45 @@
+@page "/blog"
+@inject BlogContentService Blog
+@inject NavigationManager Nav
+
+<PageTitle>Blog — Pennymatch</PageTitle>
+<HeadContent>
+    <meta name="description" content="Artículos técnicos sobre ledger de partida doble, webhooks financieros y seguridad multi-tenant en fintech B2B." />
+    <meta property="og:title" content="Blog — Pennymatch" />
+    <meta property="og:description" content="Guías prácticas de ledger, webhooks e idempotencia para equipos de producto financiero." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@Nav.ToAbsoluteUri("/blog")" />
+    <link rel="canonical" href="@Nav.ToAbsoluteUri("/blog")" />
+</HeadContent>
+
+<section class="page-hero">
+    <div class="container">
+        <p class="section-kicker">Blog</p>
+        <h1>Ingeniería financiera en producción</h1>
+        <p class="section-lead">Partida doble, webhooks e aislamiento multi-tenant — sin relleno.</p>
+    </div>
+</section>
+
+<section class="container blog-grid" aria-label="Artículos">
+    @foreach (var post in _posts)
+    {
+        <a class="blog-card-link" href="@($"/blog/{post.Slug}")">
+            <div class="blog-meta">
+                <span>@post.Category</span>
+                <time datetime="@post.PublishedAt.ToString("yyyy-MM-dd")">@post.PublishedAt.ToString("d MMM yyyy")</time>
+                <span>@post.ReadingMinutes min</span>
+            </div>
+            <h2>@post.Title</h2>
+            <p>@post.Description</p>
+        </a>
+    }
+</section>
+
+@code {
+    private IReadOnlyList<BlogPost> _posts = [];
+
+    protected override void OnInitialized()
+    {
+        _posts = Blog.GetAll();
+    }
+}

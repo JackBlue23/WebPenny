@@ -1,0 +1,28 @@
+﻿@page "/Error"
+@using System.Diagnostics
+
+<PageTitle>Error — Pennymatch</PageTitle>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>Algo no ha ido bien</h1>
+        <p class="section-lead">
+            Se produjo un error al procesar la solicitud.
+            @if (ShowRequestId)
+            {
+                <span>Request ID: <code>@RequestId</code></span>
+            }
+        </p>
+        <a class="btn btn-secondary" href="/">Volver al inicio</a>
+    </div>
+</section>
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    protected override void OnInitialized() =>
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

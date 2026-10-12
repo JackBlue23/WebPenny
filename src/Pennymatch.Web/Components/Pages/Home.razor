@@ -1,0 +1,19 @@
+﻿@page "/"
+@inject NavigationManager Nav
+@inject AuthLinkService Auth
+
+<PageTitle>Pennymatch — Ledger API para fintech B2B</PageTitle>
+<HeadContent>
+    <meta name="description" content="Pennymatch automatiza el ledger de partida doble, webhooks financieros y seguridad multi-tenant para productos de pagos y liquidaciones." />
+    <meta property="og:title" content="Pennymatch — Ledger API para fintech B2B" />
+    <meta property="og:description" content="Automatiza asientos, webhooks firmados y RBAC por tenant. Solicita una demo." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@Nav.BaseUri" />
+    <link rel="canonical" href="@Nav.BaseUri" />
+</HeadContent>
+
+<HeroSection />
+<LedgerCoreSection />
+<WebhooksSection />
+<SecuritySection />
+<PricingSection />
