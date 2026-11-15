@@ -1,0 +1,19 @@
+@inject AuthLinkService Auth
+@inject ISiteLocalizer L
+
+<section class="section" id="probar" aria-labelledby="cta-band-title">
+    <div class="container section-panel fintech-card-texture">
+        <SectionHeading Id="cta-band-title"
+                        Kicker="@L["Cta.Kicker"]"
+                        Title="@L["Cta.Title"]"
+                        Lead="@L["Cta.Lead"]" />
+        <div class="hero-actions">
+            <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Size="lg" Target="_blank" Rel="noopener noreferrer">
+                @L["Hero.CtaRegister"]
+            </CtaButton>
+            <CtaButton Href="/docs" Variant="secondary" Size="lg">
+                @L["Hero.CtaDocs"]
+            </CtaButton>
+        </div>
+    </div>
+</section>

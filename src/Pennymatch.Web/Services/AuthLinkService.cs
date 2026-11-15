@@ -27,7 +27,12 @@ public sealed class AuthLinkService
         : _options.SessionCookieName;
 
     public string LoginUrl => BuildLoginUrl(includeReturnUrl: true);
-    public string RegisterUrl => Combine(ProductBaseUrl, _options.RegisterPath);
+
+    /// <summary>Clean Client register URL (no returnUrl loop). Default: http://localhost:5288/auth/register</summary>
+    public string RegisterUrl => Combine(ProductBaseUrl, string.IsNullOrWhiteSpace(_options.RegisterPath)
+        ? "/auth/register"
+        : _options.RegisterPath);
+
     public string DemoUrl => ResolveDemo(_options.DemoPath);
 
     /// <summary>True when DemoUrl leaves the marketing origin (http/mailto).</summary>
@@ -90,12 +95,14 @@ public sealed class AuthLinkService
     {
         if (string.IsNullOrWhiteSpace(path) || path == "#")
         {
-            return "#demo";
+            return "/docs";
         }
 
+        // Site-relative manuals / anchors stay on the marketing origin.
         if (path.StartsWith('#')
             || path.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase)
-            || path.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            || path.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+            || path.StartsWith('/'))
         {
             return path;
         }

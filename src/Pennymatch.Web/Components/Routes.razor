@@ -1,6 +1,7 @@
 ﻿<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        @* FocusOnNavigate removed: it scrolls h1 into view and fights language-switch scroll restore.
+           Focus with preventScroll is handled by pennyLangSwitch.focusMainHeading (see site.js + LangScrollRestore). *@
     </Found>
 </Router>

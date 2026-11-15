@@ -1,0 +1,102 @@
+@page "/docs/{Slug}"
+@inject DocsCatalogService Docs
+@inject AuthLinkService Auth
+@inject ISiteLocalizer L
+@inject PublicUrlService Urls
+
+@if (Manual is null)
+{
+    <PageTitle>@L["Docs.NotFoundTitle"]</PageTitle>
+    <section class="page-hero">
+        <div class="container">
+            <h1>@L["Docs.NotFoundHeading"]</h1>
+            <p class="section-lead">@L["Docs.NotFoundLead"]</p>
+            <CtaButton Href="/docs" Variant="primary">@L["Docs.ViewAll"]</CtaButton>
+        </div>
+    </section>
+}
+else
+{
+    <PageTitle>@(TrimTitle($"{Manual.Title} — Pennymatch Docs"))</PageTitle>
+    <HeadContent>
+        <SeoTags Title="@TrimTitle($"{Manual.Title} — Pennymatch")"
+                 Description="@TrimDesc(Manual.Summary)"
+                 Path="@Manual.Href"
+                 OgType="article"
+                 JsonLd="@JsonLdBuilder.TechArticle(Manual.Title, Manual.Summary, Urls.Canonical(Manual.Href))" />
+    </HeadContent>
+
+    <article class="section" style="padding-top:2.5rem;">
+        <div class="container article-layout">
+            <div>
+                <header class="article-header">
+                    <p class="section-kicker">@Manual.Category · @Manual.Audience</p>
+                    <h1>@Manual.Title</h1>
+                    <p class="section-lead">@Manual.Summary</p>
+                    <div class="docs-card-tags" style="margin-top:1rem;">
+                        @foreach (var tag in Manual.Tags)
+                        {
+                            <span class="badge">@tag</span>
+                        }
+                    </div>
+                </header>
+
+                <div class="prose">
+                    @((MarkupString)BodyHtml)
+                </div>
+
+                <div class="hero-actions" style="margin-top:2.5rem;">
+                    <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
+                        @L["Hero.CtaRegister"]
+                    </CtaButton>
+                    <CtaButton Href="/docs" Variant="secondary">@L["Docs.AllManuals"]</CtaButton>
+                </div>
+            </div>
+            <aside class="sidebar">
+                <div>
+                    <h2>@L["Docs.MoreGuides"]</h2>
+                    <ul class="sidebar-list">
+                        @foreach (var item in MoreGuides)
+                        {
+                            <li>
+                                <a href="@item.Href">
+                                    @item.Title
+                                    <span>@item.Category</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </article>
+}
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private DocManual? Manual { get; set; }
+    private string BodyHtml { get; set; } = string.Empty;
+    private IReadOnlyList<DocManual> MoreGuides { get; set; } = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Manual = await Docs.GetByIdAsync(Slug);
+        if (Manual is null)
+        {
+            BodyHtml = string.Empty;
+            MoreGuides = [];
+            return;
+        }
+
+        BodyHtml = await Docs.GetBodyHtmlAsync(Manual.Id);
+        var all = await Docs.GetAllAsync();
+        MoreGuides = all.Where(m => m.Id != Manual.Id).Take(4).ToList();
+    }
+
+    private static string TrimTitle(string value) =>
+        value.Length <= 60 ? value : value[..57].TrimEnd() + "…";
+
+    private static string TrimDesc(string value) =>
+        value.Length <= 155 ? value : value[..152].TrimEnd() + "…";
+}

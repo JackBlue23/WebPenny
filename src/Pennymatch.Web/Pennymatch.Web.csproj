@@ -16,4 +16,11 @@
     </Content>
   </ItemGroup>
 
+  <!-- Rebuild Tailwind utilities before compile when Node is available -->
+  <Target Name="BuildTailwindCss" BeforeTargets="BeforeBuild" Condition="Exists('package.json')">
+    <Exec Command="npm run css:build" WorkingDirectory="$(MSBuildProjectDirectory)"
+          IgnoreExitCode="true"
+          Condition="Exists('node_modules/.bin/tailwindcss') Or Exists('node_modules/@tailwindcss/cli')" />
+  </Target>
+
 </Project>

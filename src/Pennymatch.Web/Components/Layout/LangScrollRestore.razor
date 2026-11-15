@@ -1,0 +1,30 @@
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+@* Zero UI. MainLayout OnAfterRenderAsync hook: restore scroll after culture reload, then focus h1 without scrolling. *@
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync("pennyLangSwitch.restorePosition");
+            await JS.InvokeVoidAsync("pennyLangSwitch.focusMainHeading");
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (JSException)
+        {
+            // site.js not ready yet — DOM-load restore in site.js still applies.
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+}

@@ -1,19 +1,18 @@
 ﻿@page "/"
-@inject NavigationManager Nav
-@inject AuthLinkService Auth
+@inject ISiteLocalizer L
+@inject PublicUrlService Urls
 
-<PageTitle>Pennymatch — Ledger API para fintech B2B</PageTitle>
+<PageTitle>@L["Home.Title"]</PageTitle>
 <HeadContent>
-    <meta name="description" content="Pennymatch automatiza el ledger de partida doble, webhooks financieros y seguridad multi-tenant para productos de pagos y liquidaciones." />
-    <meta property="og:title" content="Pennymatch — Ledger API para fintech B2B" />
-    <meta property="og:description" content="Automatiza asientos, webhooks firmados y RBAC por tenant. Solicita una demo." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="@Nav.BaseUri" />
-    <link rel="canonical" href="@Nav.BaseUri" />
+    <SeoTags Title="@L["Home.Title"]"
+             Description="@L["Home.Description"]"
+             OgDescription="@L["Home.OgDescription"]"
+             Path="/"
+             JsonLd="@JsonLdBuilder.SoftwareApplication(Urls.Origin + "/")" />
 </HeadContent>
 
 <HeroSection />
-<LedgerCoreSection />
-<WebhooksSection />
-<SecuritySection />
-<PricingSection />
+<FlowSimulator CultureCode="@L.Culture.Code" />
+<AdvantagesSection />
+<DocsTeaserSection />
+<CtaBandSection />
