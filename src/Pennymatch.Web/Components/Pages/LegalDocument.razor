@@ -1,0 +1,192 @@
+@page "/legal-notice"
+@page "/aviso-legal"
+@page "/privacy"
+@page "/privacidad"
+@page "/terms"
+@page "/terminos"
+@page "/cookies"
+@page "/subprocessors"
+@page "/subencargados"
+@inject ISiteLocalizer L
+@inject PublicUrlService Urls
+@inject NavigationManager Nav
+@using Pennymatch.Web.Localization
+@using Pennymatch.Web.Services
+
+<PageTitle>@PageTitleText</PageTitle>
+<HeadContent>
+    <SeoTags Title="@PageTitleText"
+             Description="@MetaDescription"
+             Path="@CanonicalPath"
+             JsonLd="@ArticleJson" />
+</HeadContent>
+
+<section class="page-hero">
+    <div class="container">
+        <p class="section-kicker">@Kicker</p>
+        <h1>@Heading</h1>
+        <p class="section-lead" style="max-width:52ch;">@Lead</p>
+    </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+    <div class="container">
+        <div class="prose" style="max-width:68ch;">
+            @if (Kind == LegalKind.Subprocessors)
+            {
+                <p>@LegalCatalog.SubprocessorsIntro(L.Culture)</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>@(En ? "Processor" : "Subencargado")</th>
+                            <th>@(En ? "Function" : "Función")</th>
+                            <th>@(En ? "Location" : "Ubicación")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in LegalCatalog.Subprocessors(L.Culture))
+                        {
+                            <tr>
+                                <td>@row.Name</td>
+                                <td>@row.Function</td>
+                                <td>@row.Location</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <p><em>@(En
+                    ? "OpenAI / GPT are not authorised subprocessors for Penny."
+                    : "OpenAI / GPT no son subencargados autorizados para Penny.")</em></p>
+            }
+            else
+            {
+                @foreach (var section in Sections)
+                {
+                    <h2>@(section.Heading)</h2>
+                    <p>@(section.Body)</p>
+                }
+            }
+
+            <p style="margin-top:2rem;">
+                <a href="/">@(En ? "Back to home" : "Volver al inicio")</a>
+                ·
+                <a href="/legal-notice">@L["Footer.LegalNotice"]</a>
+                ·
+                <a href="/privacy">@L["Footer.Privacy"]</a>
+                ·
+                <a href="/terms">@L["Footer.Terms"]</a>
+                ·
+                <a href="/cookies">@L["Footer.Cookies"]</a>
+                ·
+                <a href="/subprocessors">@L["Footer.Subprocessors"]</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+@code {
+    private enum LegalKind { Notice, Privacy, Terms, Cookies, Subprocessors }
+
+    private LegalKind Kind { get; set; }
+    private IReadOnlyList<LegalSection> Sections { get; set; } = [];
+    private string PageTitleText { get; set; } = "Pennymatch";
+    private string MetaDescription { get; set; } = "";
+    private string Heading { get; set; } = "";
+    private string Lead { get; set; } = "";
+    private string Kicker { get; set; } = "";
+    private string CanonicalPath { get; set; } = "/legal-notice";
+    private string? ArticleJson { get; set; }
+
+    private bool En => L.Culture.Code == "en";
+
+    protected override void OnParametersSet()
+    {
+        var path = new Uri(Nav.Uri).AbsolutePath.TrimEnd('/').ToLowerInvariant();
+        Kind = path switch
+        {
+            "/privacy" or "/privacidad" => LegalKind.Privacy,
+            "/terms" or "/terminos" => LegalKind.Terms,
+            "/cookies" => LegalKind.Cookies,
+            "/subprocessors" or "/subencargados" => LegalKind.Subprocessors,
+            _ => LegalKind.Notice
+        };
+
+        CanonicalPath = Kind switch
+        {
+            LegalKind.Privacy => "/privacy",
+            LegalKind.Terms => "/terms",
+            LegalKind.Cookies => "/cookies",
+            LegalKind.Subprocessors => "/subprocessors",
+            _ => "/legal-notice"
+        };
+
+        switch (Kind)
+        {
+            case LegalKind.Privacy:
+                PageTitleText = En ? "Privacy Policy — Pennymatch" : "Política de privacidad — Pennymatch";
+                Heading = En ? "Privacy Policy" : "Política de privacidad";
+                Lead = En
+                    ? "Regulation (EU) 2016/679 · Art. 28 processors listed under Subprocessors."
+                    : "Reglamento (UE) 2016/679 · subencargados art. 28 en Subencargados.";
+                Kicker = En ? "Legal" : "Legal";
+                MetaDescription = En
+                    ? "Pennymatch privacy: PGC middleware processor role, DeepSeek/Penny, PostgreSQL, Redis, Lemon Squeezy MoR. Not OpenAI."
+                    : "Privacidad Pennymatch: middleware PGC, DeepSeek/Penny, PostgreSQL, Redis, Lemon Squeezy MoR. Sin OpenAI.";
+                Sections = LegalCatalog.Privacy(L.Culture);
+                break;
+            case LegalKind.Terms:
+                PageTitleText = En ? "Terms of Service — Pennymatch" : "Términos del servicio — Pennymatch";
+                Heading = En ? "Terms of Service" : "Términos del servicio";
+                Lead = En ? "B2B SaaS · Spanish PGC middleware" : "SaaS B2B · middleware PGC español";
+                Kicker = En ? "Legal" : "Legal";
+                MetaDescription = En
+                    ? "Pennymatch terms: Stripe/Shopify/Wise to Spanish PGC journals and CSV. Not an ERP; no tax advisory."
+                    : "Términos Pennymatch: Stripe/Shopify/Wise a asientos PGC y CSV. No es ERP ni asesoría fiscal.";
+                Sections = LegalCatalog.Terms(L.Culture);
+                break;
+            case LegalKind.Cookies:
+                PageTitleText = En ? "Cookie statement — Pennymatch" : "Declaración de cookies — Pennymatch";
+                Heading = En ? "Cookie statement (strictly necessary)" : "Declaración de cookies técnicas";
+                Lead = En
+                    ? "Strictly necessary cookies only. No commercial consent banner."
+                    : "Cookies técnicas puras. Sin banner de consentimiento comercial.";
+                Kicker = En ? "Legal" : "Legal";
+                MetaDescription = En
+                    ? "Pennymatch cookies: culture + Blazor technical cookies; Google Fonts; no analytics. Lemon Squeezy only on product checkout."
+                    : "Cookies Pennymatch: cultura + Blazor técnicas; Google Fonts; sin analítica. Lemon Squeezy solo en checkout del producto.";
+                Sections = LegalCatalog.Cookies(L.Culture);
+                break;
+            case LegalKind.Subprocessors:
+                PageTitleText = En ? "Subprocessors — Pennymatch" : "Subencargados — Pennymatch";
+                Heading = En
+                    ? "List of processors (Art. 28(2) GDPR)"
+                    : "Relación de Subencargados del Tratamiento (Art. 28.2 RGPD)";
+                Lead = En
+                    ? "Art. 28 processor agreement · B2B accounting middleware"
+                    : "Encargo de tratamiento · middleware contable B2B";
+                Kicker = En ? "Legal" : "Legal";
+                MetaDescription = En
+                    ? "Pennymatch subprocessors: PostgreSQL, Redis/Garnet, DeepSeek (Penny), Lemon Squeezy MoR. No OpenAI/GPT."
+                    : "Subencargados Pennymatch: PostgreSQL, Redis/Garnet, DeepSeek (Penny), Lemon Squeezy MoR. Sin OpenAI/GPT.";
+                Sections = [];
+                break;
+            default:
+                PageTitleText = En ? "Legal notice — Pennymatch" : "Aviso legal — Pennymatch";
+                Heading = En ? "Legal notice (LSSI-CE)" : "Aviso legal (LSSI-CE)";
+                Lead = En
+                    ? "B2B SaaS · Operator identity (LSSI-CE art. 10)"
+                    : "SaaS B2B · Identidad del Operador (LSSI-CE art. 10)";
+                Kicker = En ? "Legal" : "Legal";
+                MetaDescription = En
+                    ? "Pennymatch legal notice: PENNYMATCH, S.L.U., NIF placeholder, O Carballiño. PGC middleware — not ERP or tax advisor."
+                    : "Aviso legal Pennymatch: PENNYMATCH, S.L.U., NIF placeholder, O Carballiño. Middleware PGC — no ERP ni asesoría fiscal.";
+                Sections = LegalCatalog.Notice(L.Culture);
+                break;
+        }
+
+        ArticleJson = JsonLdBuilder.TechArticle(
+            Heading,
+            MetaDescription,
+            Urls.Canonical(CanonicalPath));
+    }
+}

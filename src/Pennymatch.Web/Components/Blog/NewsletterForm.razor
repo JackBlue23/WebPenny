@@ -1,30 +1,32 @@
+@inject ISiteLocalizer L
+
 <div class="newsletter">
-    <h2>Newsletter</h2>
+    <h2>@L["Newsletter.Title"]</h2>
     <p style="font-size:var(--pm-text-sm);margin-bottom:0.75rem;">
-        Recibe guías de ledger, webhooks y seguridad multi-tenant. Sin spam.
+        @L["Newsletter.Lead"]
     </p>
 
     @if (Submitted)
     {
-        <p class="newsletter-msg" role="status">Gracias. Te avisaremos cuando publiquemos el próximo artículo.</p>
+        <p class="newsletter-msg" role="status">@L["Newsletter.Thanks"]</p>
     }
     else
     {
         <form method="post" @formname="newsletter" data-enhance>
             <AntiforgeryToken />
-            <label class="sr-only" for="newsletter-email">Email</label>
+            <label class="sr-only" for="newsletter-email">@L["Newsletter.Email"]</label>
             <input id="newsletter-email"
                    class="@(Invalid ? "invalid" : null)"
                    name="email"
                    type="email"
                    value="@Email"
-                   placeholder="tu@empresa.com"
+                   placeholder="@L["Newsletter.Placeholder"]"
                    required />
             @if (Invalid)
             {
-                <p class="validation-message">Introduce un email válido.</p>
+                <p class="validation-message">@L["Newsletter.Invalid"]</p>
             }
-            <button type="submit" class="btn btn-primary">Suscribirme</button>
+            <button type="submit" class="btn btn-primary">@L["Newsletter.Submit"]</button>
         </form>
     }
 </div>

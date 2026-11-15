@@ -1,0 +1,33 @@
+@inject PublicUrlService Urls
+@inject ISiteLocalizer L
+
+<meta name="description" content="@Description" />
+<meta property="og:title" content="@Title" />
+<meta property="og:description" content="@(string.IsNullOrWhiteSpace(OgDescription) ? Description : OgDescription)" />
+<meta property="og:type" content="@OgType" />
+<meta property="og:url" content="@CanonicalUrl" />
+<meta property="og:locale" content="@(L.Culture.Code == "en" ? "en_US" : "es_ES")" />
+<meta property="og:locale:alternate" content="@(L.Culture.Code == "en" ? "es_ES" : "en_US")" />
+<meta property="og:site_name" content="Pennymatch" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="@Title" />
+<meta name="twitter:description" content="@(string.IsNullOrWhiteSpace(OgDescription) ? Description : OgDescription)" />
+<link rel="canonical" href="@CanonicalUrl" />
+<link rel="alternate" hreflang="es" href="@CanonicalUrl" />
+<link rel="alternate" hreflang="en" href="@CanonicalUrl" />
+<link rel="alternate" hreflang="x-default" href="@CanonicalUrl" />
+@if (!string.IsNullOrWhiteSpace(JsonLd))
+{
+    <script type="application/ld+json">@((MarkupString)JsonLd)</script>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter, EditorRequired] public string Description { get; set; } = "";
+    [Parameter] public string? OgDescription { get; set; }
+    [Parameter] public string Path { get; set; } = "/";
+    [Parameter] public string OgType { get; set; } = "website";
+    [Parameter] public string? JsonLd { get; set; }
+
+    private string CanonicalUrl => Urls.Canonical(Path);
+}
