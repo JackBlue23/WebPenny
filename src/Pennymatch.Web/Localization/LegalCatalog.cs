@@ -17,10 +17,10 @@ internal static class LegalCatalog
         "Registro Mercantil de Orense, Tomo [n], Folio [n], Hoja [OU-n], Inscripción 1ª.";
 
     public const string AccountingDisclaimerEs =
-        "Pennymatch opera estrictamente como un middleware técnico e inmutable de transformación de datos. El software se limita a procesar webhooks y estructurar ficheros CSV universales compatibles con Xero, QuickBooks y Holded de acuerdo al PGC español. Pennymatch NO es un ERP, NO emite facturas del artículo 24, NO presenta liquidaciones tributarias (IVA/Sociedades) ni ejerce asesoría fiscal. La auditoría, validación y presentación de la contabilidad es responsabilidad exclusiva del Tenant y su asesor fiscal homologado.";
+        "Pennymatch opera estrictamente como un middleware técnico e inmutable de transformación de datos. El software se limita a procesar webhooks y estructurar ficheros CSV universales compatibles con Xero, QuickBooks y Holded de acuerdo al PGC como estándar riguroso de partida doble. Pennymatch NO es un ERP ni software de facturación, NO emite facturas, NO presenta modelos fiscales ni ejerce asesoría tributaria. La auditoría, validación y presentación de la contabilidad es responsabilidad exclusiva del Tenant y su asesor homologado.";
 
     public const string AccountingDisclaimerEn =
-        "Pennymatch operates strictly as an immutable technical data-transformation middleware. The software is limited to processing webhooks and structuring universal CSV files compatible with Xero, QuickBooks and Holded under the Spanish PGC. Pennymatch is NOT an ERP, does NOT issue Article 24 invoices, does NOT file tax returns (VAT/Corporate Income Tax) and does not provide tax advice. Audit, validation and filing of the accounts remain the exclusive responsibility of the Tenant and its licensed tax adviser.";
+        "Pennymatch operates strictly as an immutable technical data-transformation middleware. The software is limited to processing webhooks and structuring universal CSV files compatible with Xero, QuickBooks and Holded under the PGC as a rigorous double-entry standard. Pennymatch is NOT an ERP, is NOT invoicing software, does NOT issue invoices, does NOT file tax returns and does not provide tax advice. Audit, validation and filing of the accounts remain the exclusive responsibility of the Tenant and its licensed tax adviser.";
 
     public static string Disclaimer(UiCulture culture) =>
         culture.Code == "en" ? AccountingDisclaimerEn : AccountingDisclaimerEs;
@@ -31,7 +31,7 @@ internal static class LegalCatalog
             new("1. General information",
                 $"[Company name]: {OperatorName}. [Tax ID / NIF]: {OperatorNif}. [Registered office]: {OperatorAddress} [Contact email]: {OperatorEmail}. {MercantileRegister} Single-member limited company (S.L.U.) formed under Spanish Act 18/2022 (Crea y Crece) with share capital of one euro. Pennymatch is a B2B SaaS operator. This notice is published under Spanish Act 34/2002 (LSSI-CE)."),
             new("2. Terms of use and purpose",
-                "Pennymatch is accounting middleware / bridge: it maps sales and collection events into Spanish PGC journal drafts and optional connectors (QuickBooks Online, Xero, Holded). Lemon Squeezy, LLC is the primary Merchant of Record for the SaaS fee; Paddle Payments Ltd. may act as authorised contingency MoR under a feature flag. Access is limited to authorised tenant users. Misuse, scraping or reverse engineering is prohibited."),
+                "Pennymatch is accounting middleware / bridge: it maps sales and collection events into immutable PGC double-entry journal drafts and optional connectors (QuickBooks Online, Xero, Holded). Lemon Squeezy, LLC is the primary Merchant of Record for the SaaS fee; Paddle Payments Ltd. may act as authorised contingency MoR under a feature flag. Access is limited to authorised tenant users. Misuse, scraping or reverse engineering is prohibited."),
             new("3. Intellectual property",
                 "Software, trademarks, documentation, UI, connectors and know-how remain the exclusive property of Pennymatch or its licensors. The subscription grants a non-exclusive, non-transferable, tenant-scoped right of use. The customer retains ownership of its ledger data."),
             new("4. Disclaimer", AccountingDisclaimerEn),
@@ -43,7 +43,7 @@ internal static class LegalCatalog
             new("1. Información general",
                 $"[Nombre de la Empresa]: {OperatorName}. [CIF/NIF]: {OperatorNif}. [Domicilio Social]: {OperatorAddress} [Email de Contacto]: {OperatorEmail}. {MercantileRegister} Sociedad Limitada Unipersonal constituida al amparo de la Ley 18/2022 (Crea y Crece), con capital social de 1 euro. Pennymatch es un operador SaaS B2B. Este aviso se publica al amparo de la Ley 34/2002 (LSSI-CE)."),
             new("2. Condiciones de uso y objeto",
-                "Pennymatch es un middleware / puente contable: traduce eventos de ventas y cobros a borradores de asientos del PGC español y, en su caso, a conectores (QuickBooks Online, Xero, Holded). Lemon Squeezy, LLC es el Merchant of Record principal de la cuota SaaS; Paddle Payments Ltd. puede actuar como MoR de contingencia autorizado bajo un feature flag. El acceso queda limitado a usuarios autorizados del inquilino. Quedan prohibidos el uso indebido, el scraping y la ingeniería inversa."),
+                "Pennymatch es un middleware / puente contable: traduce eventos de ventas y cobros a borradores de asientos PGC (partida doble) y, en su caso, a conectores (QuickBooks Online, Xero, Holded). Lemon Squeezy, LLC es el Merchant of Record principal de la cuota SaaS; Paddle Payments Ltd. puede actuar como MoR de contingencia autorizado bajo un feature flag. El acceso queda limitado a usuarios autorizados del inquilino. Quedan prohibidos el uso indebido, el scraping y la ingeniería inversa."),
             new("3. Propiedad intelectual",
                 "El software, las marcas, la documentación, la interfaz, los conectores y el know-how son propiedad exclusiva de Pennymatch o de sus licenciantes. La suscripción otorga un derecho de uso no exclusivo, intransferible y limitado al inquilino. El cliente conserva la titularidad de los datos de su libro."),
             new("4. Exclusión de responsabilidad", AccountingDisclaimerEs),
@@ -55,7 +55,7 @@ internal static class LegalCatalog
         ?
         [
             new("Controller and lawful basis",
-                "Nature of the Service: Pennymatch operates as pure technical middleware in the B2B domain that transforms raw Stripe, Shopify and Wise events into immutable Spanish PGC journal drafts, exporting universal CSV files compatible with Xero, QuickBooks and Holded. Source platforms belong to the Tenant’s ecosystem; Pennymatch acts as processor of the data the Tenant integrates and as controller of account credentials. Processing is based on contract performance (Art. 6(1)(b) GDPR) and, where required, legitimate interests in securing the platform (Art. 6(1)(f))."),
+                "Nature of the Service: Pennymatch operates as pure technical middleware in the B2B domain that transforms raw Stripe, Shopify and Wise events into immutable PGC double-entry journal drafts, exporting universal CSV files compatible with Xero, QuickBooks and Holded. Source platforms belong to the Tenant’s ecosystem; Pennymatch acts as processor of the data the Tenant integrates and as controller of account credentials. Processing is based on contract performance (Art. 6(1)(b) GDPR) and, where required, legitimate interests in securing the platform (Art. 6(1)(f))."),
             new("Data categories and retention",
                 "We store identity (email, preferred language), tenant billing meters, OAuth tokens encrypted at rest with AES-256-GCM, inbound webhook payloads, journal drafts and immutable accounting audit logs. Append-only accounting audit logs are retained for six (6) years from period-end or tenant offboarding, under Spanish Commercial Code art. 30, unless a longer statutory period applies."),
             new("Rights",
@@ -67,7 +67,7 @@ internal static class LegalCatalog
         :
         [
             new("Responsable y base jurídica",
-                "Naturaleza del Servicio: Pennymatch opera como un middleware técnico puro en el ámbito B2B que transforma eventos brutos de Stripe, Shopify y Wise en borradores de asientos contables inmutables del PGC español, exportando archivos CSV universales compatibles con Xero, QuickBooks y Holded. Las plataformas de origen pertenecen al ecosistema del Tenant; Pennymatch actúa como encargado de los datos que el Tenant integra y como responsable de las credenciales de cuenta. Base: ejecución del contrato (art. 6.1.b RGPD) y, cuando proceda, interés legítimo de proteger la plataforma (art. 6.1.f)."),
+                "Naturaleza del Servicio: Pennymatch opera como un middleware técnico puro en el ámbito B2B que transforma eventos brutos de Stripe, Shopify y Wise en borradores de asientos PGC inmutables (partida doble), exportando archivos CSV universales compatibles con Xero, QuickBooks y Holded. Las plataformas de origen pertenecen al ecosistema del Tenant; Pennymatch actúa como encargado de los datos que el Tenant integra y como responsable de las credenciales de cuenta. Base: ejecución del contrato (art. 6.1.b RGPD) y, cuando proceda, interés legítimo de proteger la plataforma (art. 6.1.f)."),
             new("Categorías y conservación",
                 "Almacenamos identidad (email, idioma preferido), contadores de facturación, tokens OAuth cifrados en reposo con AES-256-GCM, payloads de webhooks, asientos en borrador y registros de auditoría contable inmutables. Los registros de auditoría contable son de solo inserción y se conservan seis (6) años desde el cierre del ejercicio o la baja del inquilino, conforme al art. 30 del Código de Comercio, salvo plazo legal superior."),
             new("Derechos",
@@ -81,7 +81,7 @@ internal static class LegalCatalog
         ?
         [
             new("1. Object of the service",
-                "Nature of the Service: Pennymatch operates as pure technical middleware in the B2B domain that transforms raw Stripe, Shopify and Wise events into immutable Spanish PGC journal drafts, exporting universal CSV files compatible with Xero, QuickBooks and Holded. Source platforms belong exclusively to the Tenant; Pennymatch acts solely as a processor of the data the Tenant integrates."),
+                "Nature of the Service: Pennymatch operates as pure technical middleware in the B2B domain that transforms raw Stripe, Shopify and Wise events into immutable PGC double-entry journal drafts, exporting universal CSV files compatible with Xero, QuickBooks and Holded. Source platforms belong exclusively to the Tenant; Pennymatch acts solely as a processor of the data the Tenant integrates."),
             new("2. Intellectual property",
                 "All software, trademarks, documentation, UI, connectors and know-how of Pennymatch remain the exclusive property of Pennymatch or its licensors. The subscription grants a non-exclusive, non-transferable, tenant-scoped right to use the service during the paid or trial term. Reverse engineering, scraping, resale of access or removal of proprietary notices is prohibited."),
             new("3. Data / GDPR",
@@ -97,7 +97,7 @@ internal static class LegalCatalog
         :
         [
             new("1. Objeto del servicio",
-                "Naturaleza del Servicio: Pennymatch opera como un middleware técnico puro en el ámbito B2B que transforma eventos brutos de Stripe, Shopify y Wise en borradores de asientos contables inmutables del PGC español, exportando archivos CSV universales compatibles con Xero, QuickBooks y Holded. Las plataformas de origen pertenecen exclusivamente al Tenant; Pennymatch actúa únicamente como procesador de los datos que este integra."),
+                "Naturaleza del Servicio: Pennymatch opera como un middleware técnico puro en el ámbito B2B que transforma eventos brutos de Stripe, Shopify y Wise en borradores de asientos PGC inmutables (partida doble), exportando archivos CSV universales compatibles con Xero, QuickBooks y Holded. Las plataformas de origen pertenecen exclusivamente al Tenant; Pennymatch actúa únicamente como procesador de los datos que este integra."),
             new("2. Propiedad intelectual",
                 "El software, las marcas, la documentación, la interfaz, los conectores y el know-how de Pennymatch son propiedad exclusiva de Pennymatch o de sus licenciantes. La suscripción otorga un derecho no exclusivo, intransferible y limitado al inquilino. Quedan prohibidos la ingeniería inversa, el scraping y la reventa de acceso."),
             new("3. Datos / RGPD",

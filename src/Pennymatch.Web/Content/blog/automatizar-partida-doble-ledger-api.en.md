@@ -13,14 +13,14 @@ tags:
   - transparency
 ---
 
-Spanish ecommerce and SaaS teams hit the same wall: Stripe payouts, Shopify orders, and Wise settlements arrive with fees and FX — then someone rebuilds them in Excel toward Holded or Xero. “Temporary” scripts last for years.
+Global ecommerce and SaaS teams hit the same wall: multi-currency Stripe payouts, Shopify orders, and Wise settlements arrive with fees and FX — then someone rebuilds them in Excel toward Xero or QuickBooks. “Temporary” scripts last for years.
 
 ## What middleware must do (and must not)
 
-Pennymatch is **not an ERP**: it does not invoice, replace Holded / Xero / QuickBooks, settle VAT, or file AEAT/SII. Its job is to:
+Pennymatch is **not an ERP and not invoicing software**: it does not issue invoices, file tax returns, or replace Xero / QuickBooks / Holded. Its job is to:
 
 1. Capture raw Stripe, Shopify, and Wise events (HMAC).
-2. Materialize **immutable PGC journals** (double-entry, 0.01 EUR tolerance).
+2. Materialize **immutable PGC double-entry journals** (0.01 tolerance, no duplicate entries).
 3. Export **universal CSVs** ready for your advisor’s ERP.
 
 Lemon Squeezy (active) and Paddle Billing v2 (contingency) collect Pennymatch’s **SaaS fee** as Merchant of Record. They are not the product’s accounting destination.
@@ -31,4 +31,4 @@ The stable contract is not the provider JSON: it is the sealed journal (debit/cr
 
 ## Closing
 
-Automate the fragile link — transcription into the PGC — and leave official books to the tools built for them. [Start a free trial](/) or read the [scope manual](/docs/scope-limits).
+Automate the fragile link — transcription into rigorous double-entry — and leave official books to the tools built for them. [Start a free trial](/) or read the [scope manual](/docs/scope-limits).

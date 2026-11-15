@@ -29,4 +29,4 @@ Respond quickly to the sender, resolve Growth/Pro/Enterprise limits from a hot c
 
 ## What not to put here
 
-Do not mix VAT settlement or SII into the receiver. Shopify VAT, when present on the source, maps to account **477**. Holded/Xero/QuickBooks get the CSV or OAuth publish — another domain. Guide: [HMAC ingest](/docs/webhooks-hmac).
+Do not mix invoice issuance or tax-return logic into the receiver. Shopify tax, when present on the source, maps to account **477**. Xero/QuickBooks/Holded get the CSV or OAuth publish — another domain. Guide: [HMAC ingest](/docs/webhooks-hmac).

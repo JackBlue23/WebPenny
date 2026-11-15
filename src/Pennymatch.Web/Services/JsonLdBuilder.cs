@@ -24,7 +24,7 @@ public static class JsonLdBuilder
             ["operatingSystem"] = "Web",
             ["url"] = canonicalHome,
             ["description"] =
-                "Technical middleware: Stripe, Shopify and Wise events to immutable Spanish PGC journals and CSV for Holded, Xero and QuickBooks.",
+                "Technical middleware: multi-currency Stripe, Shopify and Wise events to immutable PGC double-entry journals and CSV for Xero, QuickBooks and Holded.",
             ["offers"] = new Dictionary<string, object?>
             {
                 ["@type"] = "Offer",

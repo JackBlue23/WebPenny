@@ -17,7 +17,7 @@ Los equipos de ecommerce y SaaS en España tropiezan con el mismo muro: payouts 
 
 ## Qué debe hacer el middleware (y qué no)
 
-Pennymatch **no es un ERP**: no factura, no sustituye Holded / Xero / QuickBooks, no liquida IVA ni presenta AEAT/SII. Su trabajo es:
+Pennymatch **no es un ERP ni software de facturación**: no emite facturas, no presenta modelos fiscales y no sustituye Holded / Xero / QuickBooks. Su trabajo es:
 
 1. Capturar eventos crudos de Stripe, Shopify y Wise (HMAC).
 2. Materializar **asientos PGC inmutables** (partida doble, tolerancia 0,01 €).

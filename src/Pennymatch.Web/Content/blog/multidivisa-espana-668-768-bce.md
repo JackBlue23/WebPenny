@@ -14,7 +14,7 @@ tags:
   - fx
 ---
 
-Cobrar en USD o GBP y llevar el libro en EUR es el día a día de muchas tiendas y SaaS españoles. El Plan General Contable no improvisó: reserva la **668** para diferencias negativas de cambio y la **768** para positivas. El problema operativo es otro: quién calcula el tipo, cuándo y con qué prueba ante una inspección.
+Cobrar en USD o GBP y llevar el libro en EUR es el día a día de muchas tiendas y SaaS globales. El PGC, como estándar riguroso de partida doble, reserva la **668** para diferencias negativas de cambio y la **768** para positivas. El problema operativo es otro: quién calcula el tipo, cuándo y con qué rastro auditable.
 
 ## El céntimo que rompe el viernes
 
@@ -30,6 +30,6 @@ Si el widget y el asiento discrepan, **gana el asiento**.
 
 ## De la pasarela al CSV
 
-Stripe/Shopify/Wise aportan el hecho; Pennymatch asienta; Holded/Xero/QuickBooks reciben el CSV. No es liquidación de IVA ni SII: el IVA de origen, si existe, mapea a **477**. Detalle técnico: [motor PGC](/docs/pgc-engine) y [FX BCE](/docs/fx-bce).
+Stripe/Shopify/Wise aportan el hecho; Pennymatch asienta; Holded/Xero/QuickBooks reciben el CSV. No es software de facturación ni presentación de modelos: el impuesto de origen, si existe, mapea a **477**. Detalle técnico: [motor PGC](/docs/pgc-engine) y [FX BCE](/docs/fx-bce).
 
 ¿Listo para dejar de pegar tipos del periódico? [Inicia la prueba](/).

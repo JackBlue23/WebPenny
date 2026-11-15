@@ -60,19 +60,19 @@ public sealed class DocsCatalogService
             Es: new DocCopy(
                 Title: "Motor PGC: 668, 768, 129 y 477",
                 Summary:
-                "Partida doble española inmutable: diferencias de cambio, cierre trimestral, IVA de origen en 477 y tolerancia de 0,01 €.",
+                "Partida doble PGC inmutable: diferencias de cambio, cierre trimestral, impuesto de origen en 477 y tolerancia de 0,01 €.",
                 Audience: "Contable · Auditor",
                 Category: "Contabilidad"),
             En: new DocCopy(
                 Title: "PGC engine: 668, 768, 129, and 477",
                 Summary:
-                "Immutable Spanish double-entry: FX differences, quarterly close, source VAT on 477, and 0.01 EUR tolerance.",
+                "Immutable PGC double-entry: FX differences, quarterly close, source tax on 477, and 0.01 tolerance.",
                 Audience: "Bookkeeper · Auditor",
                 Category: "Accounting")),
         new(
             Id: "fx-bce",
             Href: "/docs/fx-bce",
-            Tags: ["BCE", "FX", "multi-divisa"],
+            Tags: ["BCE", "ECB", "FX", "multi-divisa"],
             Es: new DocCopy(
                 Title: "FX BCE en tres capas",
                 Summary:
@@ -80,9 +80,9 @@ public sealed class DocsCatalogService
                 Audience: "CFO · Contable",
                 Category: "Divisas"),
             En: new DocCopy(
-                Title: "Three-layer BCE FX",
+                Title: "Three-layer ECB FX",
                 Summary:
-                "Analytics query (never writes Posted), day journal, and quarterly 668/768/129 close. Rate contingency and the 0.01 EUR fuse.",
+                "Analytics query (never writes Posted), day journal, and quarterly 668/768/129 close. Rate contingency and the 0.01 fuse.",
                 Audience: "CFO · Bookkeeper",
                 Category: "FX")),
         new(
@@ -104,17 +104,17 @@ public sealed class DocsCatalogService
         new(
             Id: "scope-limits",
             Href: "/docs/scope-limits",
-            Tags: ["transparencia", "IVA", "SII", "ERP"],
+            Tags: ["transparencia", "alcance", "ERP", "CSV"],
             Es: new DocCopy(
                 Title: "Qué es y qué no es Pennymatch",
                 Summary:
-                "No ERP, no facturación certificada, no liquidación IVA/AEAT/SII. Sí middleware PGC + CSV. Planes Growth/Pro/Enterprise y techos finitos.",
+                "Qué NO incluye: no es ERP ni software de facturación; no emite facturas ni presenta modelos fiscales. Sí middleware PGC + CSV a Holded/Xero/QB. Planes con techo finito.",
                 Audience: "CEO · CFO · Gestor",
                 Category: "Producto"),
             En: new DocCopy(
                 Title: "What Pennymatch is and is not",
                 Summary:
-                "Not an ERP, not certified invoicing, not VAT/AEAT/SII settlement. Yes: PGC middleware + CSV. Growth/Pro/Enterprise finite ceilings.",
+                "Not an ERP, not invoicing software, does not issue invoices or file tax returns. Yes: PGC double-entry middleware + CSV to Xero/QB/Holded. Finite plan ceilings.",
                 Audience: "CEO · CFO · Advisor",
                 Category: "Product")),
         new(

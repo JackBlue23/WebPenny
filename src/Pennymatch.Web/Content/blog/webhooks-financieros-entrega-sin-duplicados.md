@@ -29,4 +29,4 @@ Responde rápido al emisor, consulta límites Growth/Pro/Enterprise en caché ca
 
 ## Qué no meter aquí
 
-No mezcles liquidación de IVA ni SII en el receptor. El IVA de Shopify, si viene en origen, se mapea a cuenta **477**. Holded/Xero/QuickBooks reciben el CSV o el publish OAuth — otro dominio. Guía: [ingesta HMAC](/docs/webhooks-hmac).
+No mezcles emisión de facturas ni modelos fiscales en el receptor. El impuesto de Shopify, si viene en origen, se mapea a cuenta **477**. Holded/Xero/QuickBooks reciben el CSV o el publish OAuth — otro dominio. Guía: [ingesta HMAC](/docs/webhooks-hmac).

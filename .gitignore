@@ -31,3 +31,5 @@ logs/
 node_modules/
 npm-debug.log*
 src/Pennymatch.Web/node_modules/
+
+_publish_*/

@@ -20,20 +20,22 @@
            href="@CultureHref("es")"
            lang="es"
            hreflang="es"
-           data-enhance-nav="false">@L["Lang.Esp"]</a>
+           data-enhance-nav="false"
+           data-lang-preserve="true">@L["Lang.Esp"]</a>
         <a class="lang-switch-option @(L.Culture.Code == "en" ? "is-active" : null)"
            role="menuitem"
            href="@CultureHref("en")"
            lang="en"
            hreflang="en"
-           data-enhance-nav="false">@L["Lang.Eng"]</a>
+           data-enhance-nav="false"
+           data-lang-preserve="true">@L["Lang.Eng"]</a>
     </div>
 </details>
 
 @code {
     private string CultureHref(string culture)
     {
-        // Path + query only (drop fragment) so LocalRedirect stays on the current page.
+        // Keep pathname + search + hash so /culture/set returns to the same place.
         var absolute = Nav.ToAbsoluteUri(Nav.ToBaseRelativePath(Nav.Uri));
         var relative = absolute.PathAndQuery;
         if (string.IsNullOrEmpty(relative))
@@ -41,9 +43,13 @@
             relative = "/";
         }
 
+        if (!string.IsNullOrEmpty(absolute.Fragment))
+        {
+            relative += absolute.Fragment;
+        }
+
         // Full document nav: Blazor enhanced navigation must not intercept /culture/set redirects.
         var returnUrl = Uri.EscapeDataString(relative);
         return $"/culture/set?culture={Uri.EscapeDataString(culture)}&returnUrl={returnUrl}";
     }
 }
-

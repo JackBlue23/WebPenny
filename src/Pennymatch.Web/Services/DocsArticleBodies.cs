@@ -38,8 +38,8 @@ internal static class DocsArticleBodies
         </ol>
         <h2>Planes</h2>
         <p>Growth 1.000 tx/mes · Pro 5.000 · Enterprise 20.000 (techo finito). Alerta preventiva al 90&nbsp;%; gracia +10&nbsp;% antes del bloqueo duro. Facturación SaaS vía <strong>Lemon Squeezy</strong> (MoR activo; Paddle Billing v2 en contingencia).</p>
-        <h2>Qué no espere</h2>
-        <p>Pennymatch no emite facturas, no liquida IVA ni presenta AEAT/SII, y no sustituye Holded/Xero/QuickBooks.</p>
+        <h2>Qué NO incluye</h2>
+        <p>Pennymatch <strong>no es software de facturación</strong>: no emite facturas ni presenta modelos fiscales, y no sustituye Holded, Xero ni QuickBooks.</p>
         """;
 
     private const string QuickEn = """
@@ -55,8 +55,8 @@ internal static class DocsArticleBodies
         </ol>
         <h2>Plans</h2>
         <p>Growth 1,000 tx/month · Pro 5,000 · Enterprise 20,000 (finite ceiling). Preventive alert at 90%; +10% grace before hard block. SaaS billing via <strong>Lemon Squeezy</strong> (active MoR; Paddle Billing v2 as contingency).</p>
-        <h2>What not to expect</h2>
-        <p>Pennymatch does not issue invoices, settle VAT, file AEAT/SII, or replace Holded/Xero/QuickBooks.</p>
+        <h2>What it does not include</h2>
+        <p>Pennymatch is <strong>not invoicing software</strong>: it does not issue invoices or file tax returns, and it does not replace Xero, QuickBooks, or Holded.</p>
         """;
 
     private const string WebhooksEs = """
@@ -73,7 +73,7 @@ internal static class DocsArticleBodies
         <h2>Wise y MoR de ventas</h2>
         <p>Wise aporta liquidaciones; Lemon Squeezy puede asentar ventas bajo comerciante de registro del <em>tenant</em>. No confunda eso con pagar el plan Growth/Pro/Enterprise de Pennymatch (también Lemon Squeezy / Paddle como MoR SaaS).</p>
         <h2>Qué no hacer</h2>
-        <p>No escriba aquí lógica de liquidación tributaria ni de facturación certificada. El destino del evento es el libro PGC interno y el CSV/ERP, no AEAT.</p>
+        <p>No escriba aquí lógica de emisión de facturas ni de modelos fiscales. El destino del evento es el libro PGC interno y el CSV hacia su ERP.</p>
         """;
 
     private const string WebhooksEn = """
@@ -90,7 +90,7 @@ internal static class DocsArticleBodies
         <h2>Wise and sales MoR</h2>
         <p>Wise contributes settlements; Lemon Squeezy can post sales under the tenant’s merchant-of-record. Do not confuse that with paying Pennymatch Growth/Pro/Enterprise (also Lemon Squeezy / Paddle as SaaS MoR).</p>
         <h2>What not to do</h2>
-        <p>Do not put tax settlement or certified invoicing logic here. The event’s destination is the internal PGC ledger and CSV/ERP — not AEAT.</p>
+        <p>Do not put invoice issuance or tax-return logic here. The event’s destination is the internal PGC ledger and CSV into your ERP.</p>
         """;
 
     private const string PgcEs = """
@@ -103,7 +103,7 @@ internal static class DocsArticleBodies
             <tr><td>430 / 572 / 573</td><td>Clientes / bancos / bancos moneda extranjera</td></tr>
             <tr><td>626 / 627</td><td>Comisiones de pasarela</td></tr>
             <tr><td>705 / 708</td><td>Ventas / devoluciones</td></tr>
-            <tr><td><strong>477</strong></td><td>IVA repercutido cuando el origen (p. ej. Shopify) trae impuesto — mapeo, no liquidación AEAT</td></tr>
+            <tr><td><strong>477</strong></td><td>Impuesto repercutido cuando el origen (p. ej. Shopify) trae tax — mapeo contable, no liquidación fiscal</td></tr>
             <tr><td><strong>668 / 768</strong></td><td>Diferencias negativas / positivas de cambio</td></tr>
             <tr><td><strong>129</strong></td><td>Resultado del ejercicio (cierre FX trimestral)</td></tr>
           </tbody>
@@ -122,7 +122,7 @@ internal static class DocsArticleBodies
             <tr><td>430 / 572 / 573</td><td>Customers / banks / foreign-currency banks</td></tr>
             <tr><td>626 / 627</td><td>Gateway fees</td></tr>
             <tr><td>705 / 708</td><td>Sales / returns</td></tr>
-            <tr><td><strong>477</strong></td><td>Output VAT when the source (e.g. Shopify) sends tax — mapping, not AEAT settlement</td></tr>
+            <tr><td><strong>477</strong></td><td>Output tax when the source (e.g. Shopify) sends it — ledger mapping, not tax filing</td></tr>
             <tr><td><strong>668 / 768</strong></td><td>Negative / positive exchange differences</td></tr>
             <tr><td><strong>129</strong></td><td>Profit for the year (quarterly FX close)</td></tr>
           </tbody>
@@ -148,17 +148,17 @@ internal static class DocsArticleBodies
         """;
 
     private const string FxEn = """
-        <h2>Three-layer BCE strategy</h2>
+        <h2>Three-layer ECB strategy</h2>
         <table>
           <thead><tr><th>Layer</th><th>Where</th><th>Writes Posted?</th><th>Purpose</th></tr></thead>
           <tbody>
-            <tr><td>1. Query</td><td>Dashboard · multi-currency balances</td><td>No</td><td>Analytics projection on BCE rates</td></tr>
+            <tr><td>1. Query</td><td>Dashboard · multi-currency balances</td><td>No</td><td>Analytics projection on ECB rates</td></tr>
             <tr><td>2. Day journal</td><td>Card / source currency</td><td>Yes (Draft/Ready/Posted)</td><td>Charge with rate to 4 decimals</td></tr>
             <tr><td>3. Quarter close</td><td>FX close</td><td>Yes · immutable 668/768/129 batch</td><td>Difference the day book did not close</td></tr>
           </tbody>
         </table>
         <h2>Contingency</h2>
-        <p>Live BCE feed, Redis/local cache, and cold-start fallback. Without a usable quote, a residual &gt; 0.01 EUR remains an imbalance — the rate is never invented.</p>
+        <p>Live ECB feed, Redis/local cache, and cold-start fallback. Without a usable quote, a residual &gt; 0.01 remains an imbalance — the rate is never invented.</p>
         <h2>Golden rule</h2>
         <p>If the dashboard widget and the Posted journal disagree, <strong>the journal wins</strong>.</p>
         """;
@@ -179,7 +179,7 @@ internal static class DocsArticleBodies
         <h2>Xero / QuickBooks Online</h2>
         <p>Opcional: OAuth en <strong>Conexiones</strong> para publicar fichas Ready. El CSV sigue siendo la red de seguridad si no conecta OAuth. Un segundo publish de un Posted se rechaza (inmutabilidad).</p>
         <h2>Importante</h2>
-        <p>El CSV <strong>no</strong> es la declaración SII ni el libro oficial. Es un fichero de trabajo para su ERP / gestor.</p>
+        <p>El CSV <strong>no</strong> es una declaración fiscal ni el libro oficial. Es un fichero de trabajo para su ERP / gestor (Holded, Xero o QuickBooks).</p>
         """;
 
     private const string ErpEn = """
@@ -198,17 +198,17 @@ internal static class DocsArticleBodies
         <h2>Xero / QuickBooks Online</h2>
         <p>Optional: OAuth under <strong>Connections</strong> to publish Ready cards. CSV remains the safety net without OAuth. A second publish of a Posted journal is rejected (immutability).</p>
         <h2>Important</h2>
-        <p>The CSV is <strong>not</strong> an SII filing or the official books. It is a working file for your ERP / advisor.</p>
+        <p>The CSV is <strong>not</strong> a tax filing or the official books. It is a working file for your ERP / advisor (Xero, QuickBooks, or Holded).</p>
         """;
 
     private const string ScopeEs = """
         <h2>Qué sí es</h2>
-        <p>Middleware técnico B2B de alto rendimiento: Stripe / Shopify / Wise → asientos PGC españoles inmutables → CSV universales para Xero, QuickBooks y Holded. Multi-divisa al céntimo, BCE en 3 capas, O(1), Native AOT, idempotencia atómica, auditoría SHA-256.</p>
-        <h2>Qué no es</h2>
+        <p>Middleware técnico B2B de alto rendimiento, country-agnostic: Stripe / Shopify / Wise → asientos PGC inmutables (668 / 768 / 129 / 477) → CSV universales para Xero, QuickBooks y Holded. Multi-divisa al céntimo, BCE en 3 capas, O(1), Native AOT, idempotencia atómica, auditoría SHA-256.</p>
+        <h2>Qué NO incluye</h2>
         <ul>
           <li><strong>No es un ERP</strong> — no sustituye Holded, Xero, QuickBooks, Sage ni A3.</li>
-          <li><strong>No factura</strong> con efectos jurídicos ante la AEAT (no es Veri*factu).</li>
-          <li><strong>No liquida IVA</strong> ni presenta SII/modelos/OSS por usted. El IVA de Shopify se mapea a cuenta <strong>477</strong> cuando viene en el origen.</li>
+          <li><strong>No es software de facturación</strong> — no emite facturas a clientes finales.</li>
+          <li><strong>No presenta modelos fiscales</strong> por usted. El impuesto de Shopify se mapea a cuenta <strong>477</strong> cuando viene en el origen (mapeo contable).</li>
           <li><strong>No es la pasarela</strong> ni un banco. Lemon Squeezy / Paddle cobran la cuota SaaS (MoR independientes); el dinero de su tienda lo mueve Stripe/Shopify/Wise/MoR de ventas.</li>
           <li><strong>No usa OpenAI</strong> en el copy legal de subencargados: el asistente Penny declara DeepSeek (latente mientras el flag esté apagado).</li>
         </ul>
@@ -218,12 +218,12 @@ internal static class DocsArticleBodies
 
     private const string ScopeEn = """
         <h2>What it is</h2>
-        <p>High-performance B2B technical middleware: Stripe / Shopify / Wise → immutable Spanish PGC journals → universal CSVs for Xero, QuickBooks, and Holded. Multi-currency to the cent, three-layer BCE FX, O(1), Native AOT, atomic idempotency, SHA-256 audit.</p>
+        <p>High-performance, country-agnostic B2B technical middleware: Stripe / Shopify / Wise → immutable PGC double-entry journals (668 / 768 / 129 / 477) → universal CSVs for Xero, QuickBooks, and Holded. Multi-currency to the cent, three-layer ECB FX, O(1), Native AOT, atomic idempotency (no duplicate entries), SHA-256 audit.</p>
         <h2>What it is not</h2>
         <ul>
-          <li><strong>Not an ERP</strong> — does not replace Holded, Xero, QuickBooks, Sage, or A3.</li>
-          <li><strong>Does not invoice</strong> with legal effect before AEAT (not Veri*factu).</li>
-          <li><strong>Does not settle VAT</strong> or file SII/returns/OSS for you. Shopify VAT maps to account <strong>477</strong> when present on the source.</li>
+          <li><strong>Not an ERP</strong> — does not replace Xero, QuickBooks, Holded, Sage, or A3.</li>
+          <li><strong>Not invoicing software</strong> — does not issue invoices to end customers.</li>
+          <li><strong>Does not file tax returns</strong> for you. Shopify tax maps to account <strong>477</strong> when present on the source (ledger mapping only).</li>
           <li><strong>Not the payment gateway</strong> or a bank. Lemon Squeezy / Paddle collect the SaaS fee (independent MoRs); your store’s money moves via Stripe/Shopify/Wise/sales MoR.</li>
           <li><strong>No OpenAI</strong> in legal subprocessor copy: the Penny assistant declares DeepSeek (latent while the flag is off).</li>
         </ul>

@@ -195,13 +195,14 @@ static string SanitizeReturnUrl(string? returnUrl)
         return "/";
     }
 
-    // Relative local paths only (path + optional query). Reject open redirects and culture loops.
+    // Relative local paths only (path + optional query + fragment). Reject open redirects and culture loops.
     if (!returnUrl.StartsWith('/') || returnUrl.StartsWith("//", StringComparison.Ordinal))
     {
         return "/";
     }
 
-    var path = returnUrl.Split('?', 2)[0];
+    var withoutFragment = returnUrl.Split('#', 2)[0];
+    var path = withoutFragment.Split('?', 2)[0];
     if (path.Equals("/culture/set", StringComparison.OrdinalIgnoreCase))
     {
         return "/";
