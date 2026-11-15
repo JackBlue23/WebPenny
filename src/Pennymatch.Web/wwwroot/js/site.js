@@ -29,6 +29,7 @@
   // Language switch: keep pathname/query/hash + scrollY across /culture/set full reload.
   // Destination is ALWAYS read from window.location at click time — never a stale SSR href.
   const LANG_SCROLL_KEY = "penny.lang.scroll";
+  const CULTURE_COOKIE = ".AspNetCore.Culture";
   let pendingScroll = null;
 
   try {
@@ -43,6 +44,26 @@
     // Full path + query + hash from the live browser URL (survives enhanced nav).
     const relative = location.pathname + location.search + (location.hash || "");
     return relative && relative.length > 0 ? relative : "/";
+  }
+
+  function buildCultureUrl(culture) {
+    const code = String(culture || "").toLowerCase() === "en" ? "en" : "es";
+    const returnUrl = encodeURIComponent(currentReturnUrl());
+    return `/culture/set?culture=${encodeURIComponent(code)}&returnUrl=${returnUrl}`;
+  }
+
+  /** Drop conflicting culture cookies so /culture/set is the sole source of truth. */
+  function clearCultureCookies() {
+    const expire = "Thu, 01 Jan 1970 00:00:00 GMT";
+    const paths = ["/", location.pathname || "/"];
+    for (const path of paths) {
+      document.cookie = `${CULTURE_COOKIE}=; expires=${expire}; path=${path}`;
+      document.cookie = `${CULTURE_COOKIE}=; Max-Age=0; path=${path}`;
+    }
+  }
+
+  function htmlLang() {
+    return (document.documentElement.lang || "").toLowerCase().split("-")[0];
   }
 
   window.pennyLangSwitch = {
@@ -61,21 +82,21 @@
       return data;
     },
 
+    buildCultureUrl,
+
     /**
-     * Infallible culture switch: capture live URL + scroll, then full-document navigate
-     * to /culture/set with returnUrl built NOW (not from a render-time <a href>).
-     * Must work without Blazor — InteractiveServer @onclick left ENG locked when the
-     * circuit was down (<details> still opened natively, buttons were inert).
+     * Culture switch built from live location. Prefer plain <a href> navigation;
+     * this helper is for programmatic calls and same-culture menu close.
+     * No _busy flag — never blocks a second click.
      */
-    switchCulture(culture) {
+    switchCulture(culture, options) {
       const code = String(culture || "").toLowerCase() === "en" ? "en" : "es";
-      const current = (document.documentElement.lang || "").toLowerCase();
-      if (current === code) {
-        // Already on this culture (html lang mirrors cookie after /culture/set).
-        document.querySelectorAll("[data-lang-switch]").forEach((el) => {
-          if (el.tagName === "DETAILS") el.open = false;
-        });
-        return;
+      const force = !!(options && options.force);
+      const current = htmlLang();
+
+      if (!force && current === code) {
+        this.closeAllSwitchers();
+        return false;
       }
 
       try {
@@ -87,9 +108,10 @@
       }
 
       this.savePosition();
-      const returnUrl = encodeURIComponent(currentReturnUrl());
+      clearCultureCookies();
       // Full document load so the culture cookie is applied server-side on the next request.
-      window.location.assign(`/culture/set?culture=${encodeURIComponent(code)}&returnUrl=${returnUrl}`);
+      window.location.assign(buildCultureUrl(code));
+      return true;
     },
 
     closeSwitcher(el) {
@@ -163,23 +185,71 @@
     }
   };
 
-  // Capture-phase: language buttons + legacy anchors. No Blazor circuit required.
+  /**
+   * Capture-phase for [data-lang-set] anchors/buttons.
+   * - Different culture: rewrite href from live location, clear cookies, save scroll,
+   *   then let the browser follow the GET (no preventDefault on <a>) so a stale
+   *   site.js / failed assign can never trap the user on ENG.
+   * - Same culture: preventDefault + close menu only.
+   * No _busy. No Blazor.
+   */
   document.addEventListener(
     "click",
     (event) => {
-      const btn = event.target?.closest?.("[data-lang-set]");
-      if (btn) {
-        event.preventDefault();
-        window.pennyLangSwitch.switchCulture(btn.getAttribute("data-lang-set") || "es");
+      const el = event.target?.closest?.("[data-lang-set]");
+      if (!el) {
+        const legacy = event.target?.closest?.("a[data-lang-preserve]");
+        if (!legacy) return;
+        const culture = legacy.getAttribute("hreflang") || legacy.getAttribute("lang") || "es";
+        const code = String(culture).toLowerCase() === "en" ? "en" : "es";
+        if (htmlLang() === code) {
+          event.preventDefault();
+          window.pennyLangSwitch.closeAllSwitchers();
+          return;
+        }
+        window.pennyLangSwitch.savePosition();
+        clearCultureCookies();
+        legacy.setAttribute("href", buildCultureUrl(code));
+        // Native navigation — do not preventDefault.
         return;
       }
 
-      const link = event.target?.closest?.("a[data-lang-preserve]");
-      if (!link) return;
-      // Rewrite href returnUrl from live location so a stale SSR href cannot send the user to /.
+      const code = String(el.getAttribute("data-lang-set") || "es").toLowerCase() === "en" ? "en" : "es";
+      if (htmlLang() === code) {
+        event.preventDefault();
+        window.pennyLangSwitch.closeAllSwitchers();
+        return;
+      }
+
+      window.pennyLangSwitch.savePosition();
+      clearCultureCookies();
+      const url = buildCultureUrl(code);
+
+      if (el.tagName === "A") {
+        el.setAttribute("href", url);
+        // Critical: do NOT preventDefault — plain GET must proceed even if assign fails.
+        return;
+      }
+
+      // Button fallback (older markup): navigate in JS.
       event.preventDefault();
-      const culture = link.getAttribute("hreflang") || link.getAttribute("lang") || "es";
-      window.pennyLangSwitch.switchCulture(culture);
+      window.location.assign(url);
+    },
+    true
+  );
+
+  // Also refresh hrefs when the menu opens so middle-click / open-in-new-tab stay correct.
+  document.addEventListener(
+    "toggle",
+    (event) => {
+      const root = event.target;
+      if (!root || root.tagName !== "DETAILS" || !root.matches("[data-lang-switch]") || !root.open) {
+        return;
+      }
+      root.querySelectorAll("a[data-lang-set]").forEach((a) => {
+        const code = a.getAttribute("data-lang-set") || "es";
+        a.setAttribute("href", buildCultureUrl(code));
+      });
     },
     true
   );

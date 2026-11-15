@@ -76,7 +76,17 @@ app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = static ctx =>
     {
-        var ext = Path.GetExtension(ctx.File.Name);
+        var name = ctx.File.Name;
+        // site.js drives culture switching — never pin a year-long cache on the unfingerprinted path.
+        // Fingerprinted Assets["js/site.js"] URLs remain immutable via MapStaticAssets.
+        if (name.Equals("site.js", StringComparison.OrdinalIgnoreCase))
+        {
+            ctx.Context.Response.Headers.CacheControl = "no-cache, must-revalidate";
+            ctx.Context.Response.Headers[HeaderNames.Vary] = HeaderNames.AcceptEncoding;
+            return;
+        }
+
+        var ext = Path.GetExtension(name);
         if (IsImmutableStaticExtension(ext))
         {
             ctx.Context.Response.Headers.CacheControl = "public,max-age=31536000";
@@ -90,19 +100,29 @@ app.UseRequestLocalization();
 app.UseAntiforgery();
 
 // Persist UI culture via the standard ASP.NET Core culture cookie, then redirect.
-app.MapGet("/culture/set", (string culture, string? returnUrl, HttpContext http) =>
+// Explicitly accepts es|en (UiCulture.ParseOrDefault). Clears prior culture cookies first
+// so a stale Path/Secure variant cannot keep the UI locked on ENG.
+app.MapGet("/culture/set", (string? culture, string? returnUrl, HttpContext http) =>
 {
     var ui = UiCulture.ParseOrDefault(culture);
+    var cookieName = CookieRequestCultureProvider.DefaultCookieName;
+    var secure = http.Request.IsHttps;
+
+    // Drop conflicting cookies (any prior Path/Secure combination browsers may still send).
+    http.Response.Cookies.Delete(cookieName);
+    http.Response.Cookies.Delete(cookieName, new CookieOptions { Path = "/", Secure = secure });
+    http.Response.Cookies.Delete(cookieName, new CookieOptions { Path = "/", Secure = !secure });
+
     var cookieValue = CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(ui.Code, ui.Code));
     http.Response.Cookies.Append(
-        CookieRequestCultureProvider.DefaultCookieName,
+        cookieName,
         cookieValue,
         new CookieOptions
         {
             Expires = DateTimeOffset.UtcNow.AddYears(1),
             IsEssential = true,
             HttpOnly = false,
-            Secure = http.Request.IsHttps,
+            Secure = secure,
             SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax,
             Path = "/"
         });

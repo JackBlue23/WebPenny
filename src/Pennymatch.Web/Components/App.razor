@@ -21,7 +21,8 @@
 <body>
     <Routes />
     <script src="_framework/blazor.web.js"></script>
-    <script src="js/site.js"></script>
+    @* Fingerprinted URL so Chrome cannot keep a year-cached site.js after publish. *@
+    <script src="@Assets["js/site.js"]"></script>
 </body>
 
 </html>
