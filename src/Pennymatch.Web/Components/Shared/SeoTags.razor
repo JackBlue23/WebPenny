@@ -18,7 +18,8 @@
 <link rel="alternate" hreflang="x-default" href="@CanonicalUrl" />
 @if (!string.IsNullOrWhiteSpace(JsonLd))
 {
-    <script type="application/ld+json">@((MarkupString)JsonLd)</script>
+    @* Blazor encodes '+' in attribute values (ld+json → ld&#x2B;json); emit raw MarkupString. *@
+    @((MarkupString)$"""<script type="application/ld+json">{JsonLd}</script>""")
 }
 
 @code {

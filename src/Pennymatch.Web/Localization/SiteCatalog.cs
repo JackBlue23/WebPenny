@@ -132,7 +132,7 @@ internal static class SiteCatalog
         // Home meta
         ["Home.Title"] = "Pennymatch — Middleware PGC para Stripe, Shopify y Wise",
         ["Home.Description"] =
-            "Pennymatch convierte eventos de Stripe, Shopify y Wise en asientos PGC españoles inmutables (668/768, 0,01 €, BCE) y CSV para Holded, Xero y QuickBooks. No es un ERP ni liquida IVA/AEAT.",
+            "Stripe, Shopify y Wise → asientos PGC inmutables (668/768, 0,01 €, BCE) y CSV para Holded, Xero y QuickBooks. No es un ERP ni liquida IVA/AEAT.",
         ["Home.OgDescription"] =
             "Partida doble PGC desde payouts reales. CSV a Holded/Xero/QB. Sin sustituir tu ERP.",
 
@@ -189,6 +189,7 @@ internal static class SiteCatalog
         ["Footer.Trial"] = "Prueba gratuita",
         ["Footer.Login"] = "Iniciar sesión",
         ["Footer.Register"] = "Registrarse",
+        ["Footer.Legal"] = "Legal",
         ["Footer.LegalNotice"] = "Aviso legal",
         ["Footer.Privacy"] = "Privacidad",
         ["Footer.Terms"] = "Términos",
@@ -289,7 +290,7 @@ internal static class SiteCatalog
 
         ["Home.Title"] = "Pennymatch — PGC middleware for Stripe, Shopify, and Wise",
         ["Home.Description"] =
-            "Pennymatch turns Stripe, Shopify, and Wise events into immutable Spanish PGC journals (668/768, 0.01 EUR, BCE) and CSVs for Holded, Xero, and QuickBooks. Not an ERP; no VAT/AEAT settlement.",
+            "Stripe, Shopify, and Wise → immutable Spanish PGC journals (668/768, 0.01 EUR, BCE) and CSV for Holded, Xero, and QuickBooks. Not an ERP; no VAT/AEAT.",
         ["Home.OgDescription"] =
             "Spanish double-entry from real payouts. CSV to Holded/Xero/QB. Does not replace your ERP.",
 
@@ -343,6 +344,7 @@ internal static class SiteCatalog
         ["Footer.Trial"] = "Free trial",
         ["Footer.Login"] = "Sign in",
         ["Footer.Register"] = "Sign up",
+        ["Footer.Legal"] = "Legal",
         ["Footer.LegalNotice"] = "Legal notice",
         ["Footer.Privacy"] = "Privacy",
         ["Footer.Terms"] = "Terms",
