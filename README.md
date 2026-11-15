@@ -42,16 +42,18 @@ The `.csproj` also runs `npm run css:build` before compile when `node_modules` i
 | --- | --- | --- |
 | `App:ApiBaseUrl` | Pennymatch.Api | `http://localhost:5199/` |
 | `App:ProductBaseUrl` | Pennymatch.Client origin | `http://localhost:5288` |
-| `App:LoginPath` | Client login | `/login?returnUrl=` |
-| `App:RegisterPath` | Client register (trial CTA) | `/auth/register` |
+| `App:LoginPath` | Client login (secondary CTA) | `/login?returnUrl=dashboard` |
+| `App:RegisterPath` | Primary product / trial CTA | `/login?returnUrl=dashboard` |
 | `App:DemoPath` | Secondary CTA (manuals) | `/docs` |
 | `App:SessionCookieName` | Optional same-site session cookie | _(empty)_ |
 
 Resolved CTAs in Development:
 
-- Register → `http://localhost:5288/auth/register`
-- Login → `http://localhost:5288/login?returnUrl=` + URL-encoded WebPenny origin
+- Primary / trial → `http://localhost:5288/login?returnUrl=dashboard`
+- Login (nav secondary) → `http://localhost:5288/login?returnUrl=dashboard`
 - Manuals → `/docs` (also `/manuales`)
+
+Blank Client `/auth/register` is intentionally unused until that page ships.
 
 ## Brand
 

@@ -25,10 +25,14 @@ public sealed class AppOptions
     /// </summary>
     public string PublicBaseUrl { get; set; } = "https://pennymatch.com";
 
-    /// <summary>Client login path. May include query stub like /login?returnUrl=</summary>
-    public string LoginPath { get; set; } = "/login?returnUrl=";
+    /// <summary>Client login path. Prefer a concrete returnUrl (e.g. /login?returnUrl=dashboard).</summary>
+    public string LoginPath { get; set; } = "/login?returnUrl=dashboard";
 
-    public string RegisterPath { get; set; } = "/auth/register";
+    /// <summary>
+    /// Primary product CTA path. Points at Client login with dashboard return
+    /// (blank /auth/register is avoided until Client register ships).
+    /// </summary>
+    public string RegisterPath { get; set; } = "/login?returnUrl=dashboard";
 
     /// <summary>
     /// Secondary CTA target. Absolute URL, path under ProductBaseUrl, site-relative path (/docs),

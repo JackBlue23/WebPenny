@@ -28,9 +28,12 @@ public sealed class AuthLinkService
 
     public string LoginUrl => BuildLoginUrl(includeReturnUrl: true);
 
-    /// <summary>Clean Client register URL (no returnUrl loop). Default: http://localhost:5288/auth/register</summary>
+    /// <summary>
+    /// Primary product CTA. Default: http://localhost:5288/login?returnUrl=dashboard
+    /// (avoids blank Client /auth/register until that page ships).
+    /// </summary>
     public string RegisterUrl => Combine(ProductBaseUrl, string.IsNullOrWhiteSpace(_options.RegisterPath)
-        ? "/auth/register"
+        ? "/login?returnUrl=dashboard"
         : _options.RegisterPath);
 
     public string DemoUrl => ResolveDemo(_options.DemoPath);
@@ -45,14 +48,14 @@ public sealed class AuthLinkService
         var path = _options.LoginPath;
         if (string.IsNullOrWhiteSpace(path))
         {
-            path = "/login";
+            path = "/login?returnUrl=dashboard";
         }
 
-        // Support "/login?returnUrl=" style from Client.
+        // Support "/login?returnUrl=" stub and "/login?returnUrl=dashboard" concrete values.
         if (path.Contains("returnUrl=", StringComparison.OrdinalIgnoreCase))
         {
             var baseLogin = Combine(ProductBaseUrl, path);
-            if (!includeReturnUrl)
+            if (!includeReturnUrl || HasConcreteReturnUrl(path))
             {
                 return baseLogin;
             }
@@ -69,7 +72,7 @@ public sealed class AuthLinkService
             return url;
         }
 
-        var ret = returnUrl ?? ResolveMarketingReturnUrl();
+        var ret = returnUrl ?? "dashboard";
         if (string.IsNullOrEmpty(ret))
         {
             return url;
@@ -77,6 +80,26 @@ public sealed class AuthLinkService
 
         var separator = url.Contains('?', StringComparison.Ordinal) ? "&" : "?";
         return $"{url}{separator}returnUrl={Uri.EscapeDataString(ret)}";
+    }
+
+    /// <summary>True when path already supplies a non-empty returnUrl value (not a trailing stub).</summary>
+    private static bool HasConcreteReturnUrl(string path)
+    {
+        var marker = "returnUrl=";
+        var idx = path.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+        if (idx < 0)
+        {
+            return false;
+        }
+
+        var value = path[(idx + marker.Length)..];
+        var amp = value.IndexOf('&');
+        if (amp >= 0)
+        {
+            value = value[..amp];
+        }
+
+        return !string.IsNullOrWhiteSpace(value);
     }
 
     private string? ResolveMarketingReturnUrl()
