@@ -1,10 +1,12 @@
-@rendermode InteractiveServer
-@implements IDisposable
 @inject ISiteLocalizer L
-@inject IJSRuntime JS
-@inject NavigationManager Nav
 
-<details class="lang-switch" data-lang-switch @ref="_root">
+@*
+  Static SSR by design. Culture changes MUST NOT depend on InteractiveServer/@onclick:
+  <details> opens natively even when the Blazor circuit is down, which previously left
+  ENG "locked" (menu opens, buttons inert). Destination is always built in JS from
+  window.location at click time (see pennyLangSwitch.switchCulture).
+*@
+<details class="lang-switch" data-lang-switch>
     <summary class="lang-switch-summary" aria-label="@L["Lang.Switch"]">
         <svg class="lang-switch-globe" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="9" />
@@ -22,92 +24,13 @@
                 class="lang-switch-option @(L.Culture.Code == "es" ? "is-active" : null)"
                 role="menuitem"
                 lang="es"
-                disabled="@_busy"
-                @onclick="SwitchToEsAsync">@L["Lang.Esp"]</button>
+                data-lang-set="es"
+                aria-current="@(L.Culture.Code == "es" ? "true" : null)">@L["Lang.Esp"]</button>
         <button type="button"
                 class="lang-switch-option @(L.Culture.Code == "en" ? "is-active" : null)"
                 role="menuitem"
                 lang="en"
-                disabled="@_busy"
-                @onclick="SwitchToEnAsync">@L["Lang.Eng"]</button>
+                data-lang-set="en"
+                aria-current="@(L.Culture.Code == "en" ? "true" : null)">@L["Lang.Eng"]</button>
     </div>
 </details>
-
-@code {
-    private ElementReference _root;
-    private bool _busy;
-    private bool _subscribed;
-
-    protected override void OnInitialized()
-    {
-        // Keep interactive island aware of enhanced navigations (Docs/Blog/anchors).
-        // Destination itself is always taken from window.location at click — never a stale C# field.
-        Nav.LocationChanged += OnLocationChanged;
-        _subscribed = true;
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        // Close the dropdown after in-app navigation so the next open is a fresh click.
-        _ = CloseDetailsAsync();
-    }
-
-    private Task SwitchToEsAsync() => SwitchAsync("es");
-
-    private Task SwitchToEnAsync() => SwitchAsync("en");
-
-    private async Task SwitchAsync(string culture)
-    {
-        if (_busy || string.Equals(culture, L.Culture.Code, StringComparison.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        _busy = true;
-        try
-        {
-            // Infallible path: JS reads window.location (path+search+hash) + scrollY at click time,
-            // writes sessionStorage, sets scrollRestoration=manual, then assigns /culture/set?...
-            // Never NavigateTo("/") and never trust a render-time href/returnUrl.
-            await JS.InvokeVoidAsync("pennyLangSwitch.switchCulture", culture);
-        }
-        catch (JSDisconnectedException)
-        {
-            _busy = false;
-        }
-        catch (JSException)
-        {
-            _busy = false;
-        }
-        catch (InvalidOperationException)
-        {
-            _busy = false;
-        }
-    }
-
-    private async Task CloseDetailsAsync()
-    {
-        try
-        {
-            await JS.InvokeVoidAsync("pennyLangSwitch.closeSwitcher", _root);
-        }
-        catch (JSDisconnectedException)
-        {
-        }
-        catch (JSException)
-        {
-        }
-        catch (InvalidOperationException)
-        {
-        }
-    }
-
-    public void Dispose()
-    {
-        if (_subscribed)
-        {
-            Nav.LocationChanged -= OnLocationChanged;
-            _subscribed = false;
-        }
-    }
-}

@@ -64,10 +64,20 @@
     /**
      * Infallible culture switch: capture live URL + scroll, then full-document navigate
      * to /culture/set with returnUrl built NOW (not from a render-time <a href>).
-     * Never falls back to NavigateTo("/") from C#.
+     * Must work without Blazor — InteractiveServer @onclick left ENG locked when the
+     * circuit was down (<details> still opened natively, buttons were inert).
      */
     switchCulture(culture) {
       const code = String(culture || "").toLowerCase() === "en" ? "en" : "es";
+      const current = (document.documentElement.lang || "").toLowerCase();
+      if (current === code) {
+        // Already on this culture (html lang mirrors cookie after /culture/set).
+        document.querySelectorAll("[data-lang-switch]").forEach((el) => {
+          if (el.tagName === "DETAILS") el.open = false;
+        });
+        return;
+      }
+
       try {
         if ("scrollRestoration" in history) {
           history.scrollRestoration = "manual";
@@ -87,6 +97,12 @@
       if (root && root.tagName === "DETAILS") {
         root.open = false;
       }
+    },
+
+    closeAllSwitchers() {
+      document.querySelectorAll("[data-lang-switch]").forEach((el) => {
+        if (el.tagName === "DETAILS") el.open = false;
+      });
     },
 
     restorePosition() {
@@ -147,10 +163,17 @@
     }
   };
 
-  // Legacy capture for any remaining data-lang-preserve anchors (defensive).
+  // Capture-phase: language buttons + legacy anchors. No Blazor circuit required.
   document.addEventListener(
     "click",
     (event) => {
+      const btn = event.target?.closest?.("[data-lang-set]");
+      if (btn) {
+        event.preventDefault();
+        window.pennyLangSwitch.switchCulture(btn.getAttribute("data-lang-set") || "es");
+        return;
+      }
+
       const link = event.target?.closest?.("a[data-lang-preserve]");
       if (!link) return;
       // Rewrite href returnUrl from live location so a stale SSR href cannot send the user to /.
@@ -163,8 +186,9 @@
 
   window.pennyLangSwitch.restorePosition();
 
-  // Enhanced navigation (in-app links): focus h1 without scrolling the viewport.
+  // Enhanced navigation (in-app links): focus h1 without scrolling; close open lang menus.
   document.addEventListener("enhancedload", () => {
+    window.pennyLangSwitch.closeAllSwitchers();
     window.pennyLangSwitch.focusMainHeading();
   });
 })();
