@@ -27,9 +27,23 @@
   });
 
   // Language switch: keep pathname/query/hash + scrollY across /culture/set full reload.
-  // FocusOnNavigate (h1) can re-jump after paint — restore again from MainLayout.
+  // Destination is ALWAYS read from window.location at click time — never a stale SSR href.
   const LANG_SCROLL_KEY = "penny.lang.scroll";
   let pendingScroll = null;
+
+  try {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  } catch {
+    /* ignore */
+  }
+
+  function currentReturnUrl() {
+    // Full path + query + hash from the live browser URL (survives enhanced nav).
+    const relative = location.pathname + location.search + (location.hash || "");
+    return relative && relative.length > 0 ? relative : "/";
+  }
 
   window.pennyLangSwitch = {
     savePosition() {
@@ -43,6 +57,35 @@
         sessionStorage.setItem(LANG_SCROLL_KEY, JSON.stringify(data));
       } catch {
         /* private mode / quota — culture switch still works without restore */
+      }
+      return data;
+    },
+
+    /**
+     * Infallible culture switch: capture live URL + scroll, then full-document navigate
+     * to /culture/set with returnUrl built NOW (not from a render-time <a href>).
+     * Never falls back to NavigateTo("/") from C#.
+     */
+    switchCulture(culture) {
+      const code = String(culture || "").toLowerCase() === "en" ? "en" : "es";
+      try {
+        if ("scrollRestoration" in history) {
+          history.scrollRestoration = "manual";
+        }
+      } catch {
+        /* ignore */
+      }
+
+      this.savePosition();
+      const returnUrl = encodeURIComponent(currentReturnUrl());
+      // Full document load so the culture cookie is applied server-side on the next request.
+      window.location.assign(`/culture/set?culture=${encodeURIComponent(code)}&returnUrl=${returnUrl}`);
+    },
+
+    closeSwitcher(el) {
+      const root = el && el.closest ? el.closest("[data-lang-switch]") : el;
+      if (root && root.tagName === "DETAILS") {
+        root.open = false;
       }
     },
 
@@ -82,6 +125,7 @@
           setTimeout(() => {
             apply();
             html.style.scrollBehavior = prev;
+            pendingScroll = null;
           }, 60);
         });
       } catch {
@@ -103,12 +147,16 @@
     }
   };
 
+  // Legacy capture for any remaining data-lang-preserve anchors (defensive).
   document.addEventListener(
     "click",
     (event) => {
       const link = event.target?.closest?.("a[data-lang-preserve]");
       if (!link) return;
-      window.pennyLangSwitch.savePosition();
+      // Rewrite href returnUrl from live location so a stale SSR href cannot send the user to /.
+      event.preventDefault();
+      const culture = link.getAttribute("hreflang") || link.getAttribute("lang") || "es";
+      window.pennyLangSwitch.switchCulture(culture);
     },
     true
   );

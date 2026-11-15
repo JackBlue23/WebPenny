@@ -340,6 +340,14 @@ code {
 
 .lang-switch-option {
   display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
   border-radius: 0.55rem;
   padding: 0.55rem 0.7rem;
   font-size: 0.8rem;
@@ -348,6 +356,11 @@ code {
   color: #94a3b8;
   text-decoration: none;
   transition: background 140ms ease, color 140ms ease;
+}
+
+.lang-switch-option:disabled {
+  opacity: 0.55;
+  cursor: wait;
 }
 
 .lang-switch-option:hover {
