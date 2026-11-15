@@ -26,55 +26,97 @@
     el.hidden = !hasSession;
   });
 
-  const LANG_SCROLL_KEY = "pm.lang.scroll";
+  // Language switch: keep pathname/query/hash + scrollY across /culture/set full reload.
+  // FocusOnNavigate (h1) can re-jump after paint — restore again from MainLayout.
+  const LANG_SCROLL_KEY = "penny.lang.scroll";
+  let pendingScroll = null;
 
-  // Before /culture/set full reload: stash pathname+search+hash+scrollY.
+  window.pennyLangSwitch = {
+    savePosition() {
+      const data = {
+        path: location.pathname + location.search,
+        hash: location.hash || "",
+        y: window.scrollY || 0
+      };
+      pendingScroll = data;
+      try {
+        sessionStorage.setItem(LANG_SCROLL_KEY, JSON.stringify(data));
+      } catch {
+        /* private mode / quota — culture switch still works without restore */
+      }
+    },
+
+    restorePosition() {
+      try {
+        if (!pendingScroll) {
+          const raw = sessionStorage.getItem(LANG_SCROLL_KEY);
+          if (!raw) return;
+          pendingScroll = JSON.parse(raw);
+          sessionStorage.removeItem(LANG_SCROLL_KEY);
+        }
+
+        const data = pendingScroll;
+        if (!data) return;
+
+        const here = location.pathname + location.search;
+        if (data.path && data.path !== here) {
+          pendingScroll = null;
+          return;
+        }
+
+        if (data.hash && !location.hash) {
+          history.replaceState(null, "", here + data.hash);
+        }
+
+        const y = Number(data.y);
+        if (!Number.isFinite(y) || y < 0) return;
+
+        const html = document.documentElement;
+        const prev = html.style.scrollBehavior;
+        html.style.scrollBehavior = "auto";
+
+        const apply = () => window.scrollTo(0, y);
+        apply();
+        requestAnimationFrame(() => {
+          apply();
+          setTimeout(() => {
+            apply();
+            html.style.scrollBehavior = prev;
+          }, 60);
+        });
+      } catch {
+        /* ignore corrupt payload */
+      }
+    },
+
+    focusMainHeading() {
+      const heading = document.querySelector("main h1, h1");
+      if (!heading) return;
+      if (!heading.hasAttribute("tabindex")) {
+        heading.setAttribute("tabindex", "-1");
+      }
+      try {
+        heading.focus({ preventScroll: true });
+      } catch {
+        heading.focus();
+      }
+    }
+  };
+
   document.addEventListener(
     "click",
     (event) => {
       const link = event.target?.closest?.("a[data-lang-preserve]");
       if (!link) return;
-      try {
-        sessionStorage.setItem(
-          LANG_SCROLL_KEY,
-          JSON.stringify({
-            path: location.pathname + location.search,
-            hash: location.hash || "",
-            y: window.scrollY || 0
-          })
-        );
-      } catch {
-        /* private mode / quota — culture switch still works without restore */
-      }
+      window.pennyLangSwitch.savePosition();
     },
     true
   );
 
-  // After forceLoad redirect: restore hash (if stripped) and exact scrollY.
-  try {
-    const raw = sessionStorage.getItem(LANG_SCROLL_KEY);
-    if (!raw) return;
-    sessionStorage.removeItem(LANG_SCROLL_KEY);
-    const data = JSON.parse(raw);
-    const here = location.pathname + location.search;
-    if (data.path && data.path !== here) return;
+  window.pennyLangSwitch.restorePosition();
 
-    if (data.hash && !location.hash) {
-      history.replaceState(null, "", here + data.hash);
-    }
-
-    const y = Number(data.y);
-    if (!Number.isFinite(y) || y <= 0) return;
-
-    const restore = () => window.scrollTo(0, y);
-    // Defer past Blazor/CSS layout; avoid fighting scroll-behavior: smooth.
-    requestAnimationFrame(() => {
-      restore();
-      requestAnimationFrame(restore);
-      setTimeout(restore, 0);
-      setTimeout(restore, 50);
-    });
-  } catch {
-    /* ignore corrupt payload */
-  }
+  // Enhanced navigation (in-app links): focus h1 without scrolling the viewport.
+  document.addEventListener("enhancedload", () => {
+    window.pennyLangSwitch.focusMainHeading();
+  });
 })();

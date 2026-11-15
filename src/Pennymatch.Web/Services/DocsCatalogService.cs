@@ -44,7 +44,7 @@ public sealed class DocsCatalogService
             Es: new DocCopy(
                 Title: "Ingesta firmada HMAC: Stripe, Shopify y Wise",
                 Summary:
-                "Cómo llegan los eventos crudos al libro: verificación HMAC, circuit breaker tras descuadres, idempotencia SHA-256 y buzón de ingesta.",
+                "Cómo llegan los eventos brutos al libro: verificación HMAC, circuit breaker tras descuadres, idempotencia SHA-256 y buzón de ingesta.",
                 Audience: "CTO · Ingeniería",
                 Category: "Integración"),
             En: new DocCopy(

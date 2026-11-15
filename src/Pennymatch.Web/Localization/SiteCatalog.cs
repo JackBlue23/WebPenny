@@ -56,8 +56,8 @@ internal static class SiteCatalog
             "Middleware técnico de alto rendimiento: captura payouts, comisiones y FX, los asienta en partida doble rigurosa (668 / 768, tolerancia 0,01 €, tipos BCE en 3 capas) y exporta CSV universales a Holded, Xero o QuickBooks. No es un ERP ni software de facturación: no emite facturas ni presenta modelos fiscales.",
         ["Hero.CtaRegister"] = "Iniciar Prueba Gratuita",
         ["Hero.CtaDocs"] = "Ver Manuales de Integración",
-        ["Hero.PipelineAria"] = "Flujo producto: evento crudo, asiento PGC y CSV hacia el ERP",
-        ["Hero.Pipe1Label"] = "Evento crudo",
+        ["Hero.PipelineAria"] = "Flujo producto: evento bruto, asiento PGC y CSV hacia el ERP",
+        ["Hero.Pipe1Label"] = "Evento bruto",
         ["Hero.Pipe1Code"] = "stripe.charge.succeeded",
         ["Hero.Pipe1Meta"] = "HMAC ✓ · fuente: Stripe",
         ["Hero.Pipe2Label"] = "Asiento PGC",
@@ -69,12 +69,12 @@ internal static class SiteCatalog
 
         // Simulator
         ["Sim.Kicker"] = "Simulador transaccional",
-        ["Sim.Title"] = "Del evento crudo al asiento PGC en tres latidos",
+        ["Sim.Title"] = "Del evento bruto al asiento contable en tres pasos",
         ["Sim.Lead"] =
             "Elige la fuente, observa el pipeline Native AOT en .NET 9 y el borrador inmutable listo para CSV hacia Holded, Xero o QuickBooks — con hot cache O(1).",
         ["Sim.Aria"] = "Simulador de flujo transaccional",
         ["Sim.Source"] = "Fuente",
-        ["Sim.SourceHint"] = "Evento transaccional crudo",
+        ["Sim.SourceHint"] = "Evento transaccional bruto",
         ["Sim.SelectSource"] = "Seleccionar fuente",
         ["Sim.Processor"] = ".NET 9 AOT",
         ["Sim.ProcessorHint"] = "PGC + huella SHA-256",
@@ -98,21 +98,21 @@ internal static class SiteCatalog
 
         // Advantages
         ["Adv.Kicker"] = "Ventajas competitivas",
-        ["Adv.Title"] = "El eslabón que ecommerce y SaaS globales siguen haciendo en Excel",
+        ["Adv.Title"] = "El trabajo contable que ecommerce y SaaS globales aún resuelven en hojas de cálculo",
         ["Adv.Lead"] =
-            "Payouts de Stripe, pedidos Shopify y liquidaciones Wise llegan con comisiones y FX. Pennymatch los convierte en asientos PGC nativos — no en otro conector genérico que te deja el céntimo a ti.",
+            "Payouts de Stripe, pedidos Shopify y liquidaciones Wise llegan con comisiones y FX. Pennymatch los convierte en asientos PGC de partida doble — no en otro conector genérico que deja el céntimo sin asentar.",
         ["Adv.Card1Kicker"] = "PGC nativo",
-        ["Adv.Card1Title"] = "668 / 768, 0,01 € y partida doble",
+        ["Adv.Card1Title"] = "668 / 768, 0,01 € y partida doble inmutable",
         ["Adv.Card1Body"] =
-            "Diferencias negativas (668) y positivas (768) de cambio, cierre contra 129, impuesto de origen en 477 cuando Shopify lo trae. Tolerancia de un céntimo: por encima es descuadre, no «redondeo creativo».",
+            "Los payouts multi-divisa descuadran el libro cuando comisiones y FX se asientan a mano. Pennymatch aplica diferencias 668/768, cierre contra 129 e impuesto de origen en 477 (Shopify), con tolerancia de 0,01 €. Resultado: borradores inmutables listos para auditoría, sin redondeos ad hoc.",
         ["Adv.Card2Kicker"] = "FX BCE",
         ["Adv.Card2Title"] = "Tres capas: consulta, asiento y cierre",
         ["Adv.Card2Body"] =
-            "Widget analítico sin tocar el libro, tipo del día en cada asiento y cierre trimestral inmutable con BCE. Multi-divisa al céntimo — sin pegar tipos del periódico en un Excel.",
+            "Tipos inconsistentes entre panel, asiento y cierre generan descuadres. Pennymatch aplica BCE en tres capas — widget analítico, tipo del día por asiento y cierre trimestral inmutable — sin buscar ni introducir manualmente tipos de cambio en hojas de cálculo. Multi-divisa al céntimo con rastro auditable.",
         ["Adv.Card3Kicker"] = "Velocidad y auditoría",
         ["Adv.Card3Title"] = "O(1), Native AOT y SHA-256 encadenado",
         ["Adv.Card3Body"] =
-            "Ingesta O(1), idempotencia atómica, asientos Posted inmutables, cifrado y cadena SHA-256 lista para auditoría. CSV universal a Holded, Xero y QuickBooks — sin sustituirlos.",
+            "Scripts frágiles y exports sin huella no resisten una revisión. Pennymatch ingiere en O(1) con idempotencia atómica, sella asientos Posted con cadena SHA-256 y exporta CSV a Holded, Xero y QuickBooks. Operación auditable sin sustituir tu ERP.",
         ["Adv.Disclaimer"] =
             "<strong>Qué NO incluye:</strong> Pennymatch <strong>no es un ERP ni software de facturación</strong>: no emite facturas, no presenta modelos fiscales y no reemplaza Holded, Xero ni QuickBooks. Es middleware de partida doble hacia tu libro. La suscripción SaaS se cobra vía Lemon Squeezy (MoR activo; Paddle Billing v2 en contingencia).",
 
@@ -162,7 +162,7 @@ internal static class SiteCatalog
         ["Blog.OgDescription"] =
             "Guías prácticas de partida doble PGC, FX BCE e idempotencia SHA-256.",
         ["Blog.Kicker"] = "Blog",
-        ["Blog.Heading"] = "Ingeniería del puente al PGC",
+        ["Blog.Heading"] = "Guías técnicas de middleware PGC",
         ["Blog.Lead"] = "Webhooks, asientos inmutables y multi-divisa al céntimo — transparencia sobre lo que Pennymatch no es.",
         ["Blog.ArticlesAria"] = "Artículos",
         ["Blog.NotFoundTitle"] = "Artículo no encontrado — Pennymatch",
@@ -219,8 +219,8 @@ internal static class SiteCatalog
             "High-performance technical middleware: capture multi-currency payouts, fees, and FX, post immutable double-entry drafts (PGC accounts 668 / 768, 0.01 tolerance, three-layer ECB rates), and export universal CSVs to Xero, QuickBooks, or Holded. Not an ERP. Not invoicing software — and never posts duplicate entries.",
         ["Hero.CtaRegister"] = "Start free trial",
         ["Hero.CtaDocs"] = "View integration manuals",
-        ["Hero.PipelineAria"] = "Product flow: raw event, PGC journal, and CSV toward the ERP",
-        ["Hero.Pipe1Label"] = "Raw event",
+        ["Hero.PipelineAria"] = "Product flow: raw payment event, PGC journal, and CSV toward the ERP",
+        ["Hero.Pipe1Label"] = "Raw payment event",
         ["Hero.Pipe1Code"] = "stripe.charge.succeeded",
         ["Hero.Pipe1Meta"] = "HMAC ✓ · source: Stripe",
         ["Hero.Pipe2Label"] = "PGC journal",
@@ -231,12 +231,12 @@ internal static class SiteCatalog
         ["Hero.Pipe3Meta"] = "exported · hot cache O(1)",
 
         ["Sim.Kicker"] = "Transactional simulator",
-        ["Sim.Title"] = "From raw event to PGC journal in three heartbeats",
+        ["Sim.Title"] = "From raw payment event to double-entry journal in three steps",
         ["Sim.Lead"] =
             "Choose the source, watch the .NET 9 Native AOT pipeline, and see the immutable draft ready for CSV to Holded, Xero, or QuickBooks — with O(1) hot cache.",
         ["Sim.Aria"] = "Transactional flow simulator",
         ["Sim.Source"] = "Source",
-        ["Sim.SourceHint"] = "Raw transactional event",
+        ["Sim.SourceHint"] = "Raw payment event",
         ["Sim.SelectSource"] = "Select source",
         ["Sim.Processor"] = ".NET 9 AOT",
         ["Sim.ProcessorHint"] = "PGC + SHA-256 footprint",
@@ -259,21 +259,21 @@ internal static class SiteCatalog
         ["Sim.StatusCache"] = "O(1) hot cache updated",
 
         ["Adv.Kicker"] = "Competitive advantages",
-        ["Adv.Title"] = "The missing link global ecommerce and SaaS still finish in Excel",
+        ["Adv.Title"] = "The accounting work global ecommerce and SaaS still finish in spreadsheets",
         ["Adv.Lead"] =
-            "Stripe payouts, Shopify orders, and Wise settlements arrive with fees and FX. Pennymatch turns them into native PGC double-entry — not another generic connector that leaves the cent to you.",
+            "Stripe payouts, Shopify orders, and Wise settlements arrive with fees and FX. Pennymatch turns them into native PGC double-entry — not another generic connector that leaves the cent unposted.",
         ["Adv.Card1Kicker"] = "PGC double-entry",
         ["Adv.Card1Title"] = "668 / 768, 0.01, immutable journals",
         ["Adv.Card1Body"] =
-            "Negative (668) and positive (768) FX differences, period close against 129, source-sourced tax on 477 when Shopify sends it. One-cent tolerance: above that is imbalance, not creative rounding — and duplicates are rejected.",
+            "Multi-currency payouts break the books when fees and FX are posted by hand. Pennymatch applies 668/768 differences, period close against 129, and origin tax on 477 when Shopify sends it, with 0.01 tolerance. Result: immutable drafts ready for audit — duplicates rejected, no ad-hoc rounding.",
         ["Adv.Card2Kicker"] = "ECB FX",
         ["Adv.Card2Title"] = "Three layers: query, journal, close",
         ["Adv.Card2Body"] =
-            "Analytics widget that never writes the book, per-day ECB rate on each journal, and immutable quarterly close. Multi-currency to the cent — no newspaper rates pasted into a spreadsheet.",
+            "Inconsistent rates across dashboard, journal, and close create imbalances. Pennymatch applies ECB rates in three layers — analytics widget, per-day rate on each journal, and immutable quarterly close — without manually looking up exchange rates in spreadsheets. Multi-currency to the cent with an auditable trail.",
         ["Adv.Card3Kicker"] = "Speed and audit",
         ["Adv.Card3Title"] = "O(1), Native AOT, chained SHA-256",
         ["Adv.Card3Body"] =
-            "O(1) ingest, atomic idempotency, immutable Posted journals, encryption, and a SHA-256 chain built for audit. Universal CSV to Xero, QuickBooks, and Holded — without replacing them.",
+            "Fragile scripts and unsigned exports fail review. Pennymatch ingests in O(1) with atomic idempotency, seals Posted journals with a SHA-256 chain, and exports CSV to Xero, QuickBooks, and Holded. Auditable operations without replacing your ERP.",
         ["Adv.Disclaimer"] =
             "<strong>What it is not:</strong> Pennymatch is <strong>not an ERP and not invoicing software</strong>: it does not issue invoices, file tax returns, or replace Xero, QuickBooks, or Holded. It is double-entry middleware into your books. The SaaS fee is billed via Lemon Squeezy (active MoR; Paddle Billing v2 as contingency).",
 
@@ -318,7 +318,7 @@ internal static class SiteCatalog
         ["Blog.OgDescription"] =
             "Practical guides for PGC double-entry, ECB FX, and SHA-256 idempotency.",
         ["Blog.Kicker"] = "Blog",
-        ["Blog.Heading"] = "Engineering the bridge to the ledger",
+        ["Blog.Heading"] = "Technical guides for PGC middleware",
         ["Blog.Lead"] = "Webhooks, immutable journals, and multi-currency to the cent — clear about what Pennymatch is not.",
         ["Blog.ArticlesAria"] = "Articles",
         ["Blog.NotFoundTitle"] = "Article not found — Pennymatch",

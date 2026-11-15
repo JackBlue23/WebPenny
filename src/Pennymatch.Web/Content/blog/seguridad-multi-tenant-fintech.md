@@ -29,4 +29,4 @@ Claves de idempotencia SHA-256 ligadas al tenant; cadena de auditoría append-on
 
 ## Límites claros
 
-Aislar tenants no convierte a Pennymatch en un ERP. Holded, Xero y QuickBooks siguen siendo el destino oficial; aquí protegemos el puente evento → PGC → CSV. Más en [seguridad y facturación](/docs/security-billing).
+Aislar tenants no convierte a Pennymatch en un ERP. Holded, Xero y QuickBooks siguen siendo el destino oficial; aquí protegemos el flujo evento → PGC → CSV. Más en [seguridad y facturación](/docs/security-billing).

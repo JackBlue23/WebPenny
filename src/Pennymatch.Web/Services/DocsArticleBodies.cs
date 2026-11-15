@@ -61,12 +61,12 @@ internal static class DocsArticleBodies
 
     private const string WebhooksEs = """
         <h2>Objetivo</h2>
-        <p>Recibir eventos crudos de Stripe, Shopify y Wise con verificación HMAC e idempotencia, y materializar borradores PGC — no parsers ad hoc ni spaghetti por proveedor.</p>
+        <p>Recibir eventos brutos de Stripe, Shopify y Wise con verificación HMAC e idempotencia, y materializar borradores PGC — no parsers ad hoc ni spaghetti por proveedor.</p>
         <h2>Flujo recomendado</h2>
         <ol>
           <li>Configure el endpoint de webhook en el panel de Stripe/Shopify (no hay OAuth de Stripe/Shopify en Pennymatch: es HMAC → PGC).</li>
           <li>Verifique la firma HMAC con el secreto rotado.</li>
-          <li>El payload crudo alimenta el mapper; el contrato estable es el asiento (cuentas Debe/Haber + correlación SHA-256).</li>
+          <li>El payload de origen alimenta el mapper; el contrato estable es el asiento (cuentas Debe/Haber + correlación SHA-256).</li>
           <li>Rechace duplicados con la huella del evento normalizado.</li>
           <li>Tras 3 descuadres consecutivos (&gt; 0,01 €) el circuit breaker pausa la ingesta hasta reactivación Admin.</li>
         </ol>

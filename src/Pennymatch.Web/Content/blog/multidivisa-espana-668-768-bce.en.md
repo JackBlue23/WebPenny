@@ -32,4 +32,4 @@ If the widget and the journal disagree, **the journal wins**.
 
 Stripe/Shopify/Wise supply the fact; Pennymatch posts; Xero/QuickBooks/Holded receive the CSV. This is not invoicing software or tax filing: source tax, when present, maps to **477**. Technical detail: [PGC engine](/docs/pgc-engine) and [ECB FX](/docs/fx-bce).
 
-Ready to stop pasting newspaper rates? [Start the trial](/).
+Ready to stop manually looking up exchange rates in spreadsheets? [Start the trial](/).

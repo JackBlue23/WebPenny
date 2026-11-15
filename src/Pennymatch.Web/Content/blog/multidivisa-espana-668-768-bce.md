@@ -32,4 +32,4 @@ Si el widget y el asiento discrepan, **gana el asiento**.
 
 Stripe/Shopify/Wise aportan el hecho; Pennymatch asienta; Holded/Xero/QuickBooks reciben el CSV. No es software de facturación ni presentación de modelos: el impuesto de origen, si existe, mapea a **477**. Detalle técnico: [motor PGC](/docs/pgc-engine) y [FX BCE](/docs/fx-bce).
 
-¿Listo para dejar de pegar tipos del periódico? [Inicia la prueba](/).
+¿Listo para dejar de buscar e introducir manualmente tipos de cambio en hojas de cálculo? [Inicia la prueba](/).

@@ -1,5 +1,5 @@
 ---
-title: Why PGC middleware is not an ERP (or a MoR bridge)
+title: Why PGC middleware is not an ERP (or a MoR connector)
 description: How to separate Stripe/Shopify/Wise, immutable PGC journals, and CSV to Holded/Xero/QuickBooks without building an ERP or settling VAT.
 author: Pennymatch team
 slug: automatizar-partida-doble-ledger-api
@@ -25,10 +25,10 @@ Pennymatch is **not an ERP and not invoicing software**: it does not issue invoi
 
 Lemon Squeezy (active) and Paddle Billing v2 (contingency) collect Pennymatch’s **SaaS fee** as Merchant of Record. They are not the product’s accounting destination.
 
-## From raw event to Posted journal
+## From raw payment event to Posted journal
 
 The stable contract is not the provider JSON: it is the sealed journal (debit/credit accounts + SHA-256 correlation). Draft → Ready → **Posted**. Posted is never rewritten.
 
 ## Closing
 
-Automate the fragile link — transcription into rigorous double-entry — and leave official books to the tools built for them. [Start a free trial](/) or read the [scope manual](/docs/scope-limits).
+Automate transcription into rigorous double-entry — the operational step that accumulates the most errors — and leave official books to the tools built for them. [Start a free trial](/) or read the [scope manual](/docs/scope-limits).
