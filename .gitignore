@@ -26,3 +26,10 @@ appsettings.*.local.json
 ## Logs
 *.log
 logs/
+
+## Node / Tailwind
+node_modules/
+npm-debug.log*
+src/Pennymatch.Web/node_modules/
+
+_publish_*/

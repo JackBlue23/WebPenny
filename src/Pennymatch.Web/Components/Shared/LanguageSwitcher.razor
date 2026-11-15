@@ -1,0 +1,57 @@
+@inject ISiteLocalizer L
+@inject NavigationManager Nav
+
+<details class="lang-switch" data-lang-switch>
+    <summary class="lang-switch-summary" aria-label="@L["Lang.Switch"]">
+        <svg class="lang-switch-globe" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M3 12h18" />
+            <path d="M12 3a14 14 0 0 1 0 18" />
+            <path d="M12 3a14 14 0 0 0 0 18" />
+        </svg>
+        <span class="lang-switch-label">@L.Culture.ActiveLabel</span>
+        <svg class="lang-switch-chevron" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6" />
+        </svg>
+    </summary>
+    <div class="lang-switch-menu" role="menu" aria-label="@L["Lang.Switch"]">
+        <a class="lang-switch-option @(L.Culture.Code == "es" ? "is-active" : null)"
+           role="menuitem"
+           href="@CultureHref("es")"
+           lang="es"
+           hreflang="es"
+           data-enhance-nav="false"
+           data-lang-preserve="true"
+           onclick="window.pennyLangSwitch&&window.pennyLangSwitch.savePosition()">@L["Lang.Esp"]</a>
+        <a class="lang-switch-option @(L.Culture.Code == "en" ? "is-active" : null)"
+           role="menuitem"
+           href="@CultureHref("en")"
+           lang="en"
+           hreflang="en"
+           data-enhance-nav="false"
+           data-lang-preserve="true"
+           onclick="window.pennyLangSwitch&&window.pennyLangSwitch.savePosition()">@L["Lang.Eng"]</a>
+    </div>
+</details>
+
+@code {
+    private string CultureHref(string culture)
+    {
+        // Keep pathname + search + hash — never force NavigateTo("/") or strip the route.
+        var absolute = Nav.ToAbsoluteUri(Nav.ToBaseRelativePath(Nav.Uri));
+        var relative = absolute.PathAndQuery;
+        if (string.IsNullOrEmpty(relative))
+        {
+            relative = "/";
+        }
+
+        if (!string.IsNullOrEmpty(absolute.Fragment))
+        {
+            relative += absolute.Fragment;
+        }
+
+        // Full document nav: Blazor enhanced navigation must not intercept /culture/set redirects.
+        var returnUrl = Uri.EscapeDataString(relative);
+        return $"/culture/set?culture={Uri.EscapeDataString(culture)}&returnUrl={returnUrl}";
+    }
+}

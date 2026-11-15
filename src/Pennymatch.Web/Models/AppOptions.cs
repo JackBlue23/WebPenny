@@ -19,15 +19,22 @@ public sealed class AppOptions
     /// </summary>
     public string ProductBaseUrl { get; set; } = "http://localhost:5288";
 
+    /// <summary>
+    /// Public production origin for canonical, hreflang, Open Graph and sitemap.
+    /// Must never be localhost — SEO tags fall back to https://pennymatch.com.
+    /// </summary>
+    public string PublicBaseUrl { get; set; } = "https://pennymatch.com";
+
     /// <summary>Client login path. May include query stub like /login?returnUrl=</summary>
     public string LoginPath { get; set; } = "/login?returnUrl=";
 
-    public string RegisterPath { get; set; } = "/register";
+    public string RegisterPath { get; set; } = "/auth/register";
 
     /// <summary>
-    /// Demo CTA target. Absolute URL, path under ProductBaseUrl, page anchor (#...), or mailto:.
+    /// Secondary CTA target. Absolute URL, path under ProductBaseUrl, site-relative path (/docs),
+    /// page anchor (#...), or mailto:. Default: integration manuals hub.
     /// </summary>
-    public string DemoPath { get; set; } = "#demo";
+    public string DemoPath { get; set; } = "/docs";
 
     /// <summary>
     /// Optional cookie name shared with the product app when both are same-site.
