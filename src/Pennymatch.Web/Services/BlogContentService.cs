@@ -1,5 +1,6 @@
 using System.Globalization;
 using Markdig;
+using Pennymatch.Web.Localization;
 using Pennymatch.Web.Models;
 
 namespace Pennymatch.Web.Services;
@@ -10,7 +11,7 @@ public sealed class BlogContentService
     private readonly ILogger<BlogContentService> _logger;
     private readonly MarkdownPipeline _pipeline;
     private readonly object _gate = new();
-    private IReadOnlyList<BlogPost>? _cache;
+    private IReadOnlyList<LocalizedBlogPost>? _cache;
 
     public BlogContentService(IWebHostEnvironment env, ILogger<BlogContentService> logger)
     {
@@ -25,13 +26,21 @@ public sealed class BlogContentService
     public IReadOnlyList<BlogPost> GetAll()
     {
         EnsureLoaded();
-        return _cache!;
+        var lang = CurrentLang();
+        return _cache!
+            .Where(p => p.Lang == lang)
+            .Select(p => p.Post)
+            .ToList();
     }
 
     public BlogPost? GetBySlug(string slug)
     {
         EnsureLoaded();
-        return _cache!.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
+        var lang = CurrentLang();
+        return _cache!
+            .Where(p => p.Lang == lang && p.Post.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase))
+            .Select(p => p.Post)
+            .FirstOrDefault();
     }
 
     public IReadOnlyList<BlogPost> GetRecommended(string? excludeSlug, int take = 3)
@@ -41,6 +50,9 @@ public sealed class BlogContentService
             .Take(take)
             .ToList();
     }
+
+    private static string CurrentLang() =>
+        UiCulture.From(CultureInfo.CurrentUICulture).Code;
 
     private void EnsureLoaded()
     {
@@ -64,7 +76,7 @@ public sealed class BlogContentService
                 return;
             }
 
-            var posts = new List<BlogPost>();
+            var posts = new List<LocalizedBlogPost>();
             foreach (var file in Directory.EnumerateFiles(dir, "*.md").OrderBy(f => f))
             {
                 try
@@ -78,34 +90,43 @@ public sealed class BlogContentService
             }
 
             _cache = posts
-                .OrderByDescending(p => p.PublishedAt)
-                .ThenBy(p => p.Title, StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(p => p.Post.PublishedAt)
+                .ThenBy(p => p.Post.Title, StringComparer.OrdinalIgnoreCase)
                 .ToList();
         }
     }
 
-    private BlogPost ParseFile(string path)
+    private LocalizedBlogPost ParseFile(string path)
     {
         var raw = File.ReadAllText(path);
         var (frontMatter, body) = SplitFrontMatter(raw);
         var meta = ParseFrontMatter(frontMatter);
-        var slug = meta.Slug ?? Path.GetFileNameWithoutExtension(path);
+        var fileName = Path.GetFileNameWithoutExtension(path);
+        var lang = meta.Lang ?? (fileName.EndsWith(".en", StringComparison.OrdinalIgnoreCase) ? "en" : "es");
+        var slugBase = fileName.EndsWith(".en", StringComparison.OrdinalIgnoreCase)
+            ? fileName[..^3]
+            : fileName;
+        var slug = meta.Slug ?? slugBase;
         var html = Markdown.ToHtml(body.Trim(), _pipeline);
 
-        return new BlogPost
-        {
-            Slug = slug,
-            Title = meta.Title ?? slug,
-            Description = meta.Description ?? string.Empty,
-            Author = meta.Author ?? "Equipo Pennymatch",
-            PublishedAt = meta.PublishedAt ?? DateOnly.FromDateTime(File.GetLastWriteTimeUtc(path)),
-            Category = meta.Category ?? "Producto",
-            Tags = meta.Tags ?? [],
-            ReadingMinutes = EstimateReadingMinutes(body),
-            Markdown = body.Trim(),
-            Html = html
-        };
+        return new LocalizedBlogPost(
+            lang,
+            new BlogPost
+            {
+                Slug = slug,
+                Title = meta.Title ?? slug,
+                Description = meta.Description ?? string.Empty,
+                Author = meta.Author ?? (lang == "en" ? "Pennymatch team" : "Equipo Pennymatch"),
+                PublishedAt = meta.PublishedAt ?? DateOnly.FromDateTime(File.GetLastWriteTimeUtc(path)),
+                Category = meta.Category ?? (lang == "en" ? "Product" : "Producto"),
+                Tags = meta.Tags ?? [],
+                ReadingMinutes = EstimateReadingMinutes(body),
+                Markdown = body.Trim(),
+                Html = html
+            });
     }
+
+    private sealed record LocalizedBlogPost(string Lang, BlogPost Post);
 
     private static (string FrontMatter, string Body) SplitFrontMatter(string raw)
     {
@@ -176,6 +197,11 @@ public sealed class BlogContentService
                 case "slug":
                     dto.Slug = value;
                     break;
+                case "lang":
+                case "language":
+                case "locale":
+                    dto.Lang = value.Equals("en", StringComparison.OrdinalIgnoreCase) ? "en" : "es";
+                    break;
                 case "category":
                     dto.Category = value;
                     break;
@@ -231,6 +257,7 @@ public sealed class BlogContentService
         public string? Description { get; set; }
         public string? Author { get; set; }
         public string? Slug { get; set; }
+        public string? Lang { get; set; }
         public string? Category { get; set; }
         public DateOnly? PublishedAt { get; set; }
         public List<string>? Tags { get; set; }

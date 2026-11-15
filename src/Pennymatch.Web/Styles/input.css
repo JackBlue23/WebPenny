@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@source "../Components/**/*.{razor,cs,html}";
+@source "../wwwroot/**/*.html";
+
+/* Brand theme — Pennymatch dark emerald (matches tokens.css) */
+@theme {
+  --color-pm-bg: #0f172a;
+  --color-pm-bg-deep: #020617;
+  --color-pm-surface: #1e293b;
+  --color-pm-accent: #34d399;
+  --color-pm-accent-bright: #6ee7b7;
+  --color-pm-accent-deep: #10b981;
+  --color-pm-ink: #e2e8f0;
+  --color-pm-muted: #94a3b8;
+  --color-pm-white: #f8fafc;
+  --font-sans: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-mono: "JetBrains Mono", "Consolas", monospace;
+}
+
+@layer utilities {
+  .glass-panel {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+  }
+}

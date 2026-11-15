@@ -1,0 +1,210 @@
+@rendermode InteractiveServer
+@inject ISiteLocalizer L
+@using Pennymatch.Web.Localization
+
+<section class="section" id="simulador" aria-labelledby="sim-title">
+    <div class="container">
+        <SectionHeading Id="sim-title"
+                        Kicker="@T("Sim.Kicker")"
+                        Title="@T("Sim.Title")"
+                        Lead="@T("Sim.Lead")" />
+
+        <div class="flow-sim glass-panel" role="group" aria-label="@T("Sim.Aria")">
+            <div class="flow-col">
+                <h3 class="flow-col-title">@T("Sim.Source")</h3>
+                <p class="flow-col-hint">@T("Sim.SourceHint")</p>
+                <div class="flow-source-list" role="listbox" aria-label="@T("Sim.SelectSource")">
+                    @foreach (var source in Sources)
+                    {
+                        var selected = SelectedSource == source.Id;
+                        <button type="button"
+                                class="flow-source @(selected ? "is-active" : null)"
+                                role="option"
+                                aria-selected="@selected"
+                                @onclick="() => SelectSource(source.Id)">
+                            <span class="flow-source-name">@source.Name</span>
+                            <span class="flow-source-event">@source.EventType</span>
+                        </button>
+                    }
+                </div>
+                <pre class="flow-payload"><code>@CurrentSource.RawJson</code></pre>
+            </div>
+
+            <div class="flow-col flow-col-center">
+                <h3 class="flow-col-title">@T("Sim.Processor")</h3>
+                <p class="flow-col-hint">@T("Sim.ProcessorHint")</p>
+                <div class="flow-processor @(IsProcessing ? "is-processing" : null)" aria-live="polite">
+                    <div class="flow-processor-ring" aria-hidden="true"></div>
+                    <p class="flow-processor-status">@ProcessorStatus</p>
+                    <ul class="flow-processor-steps">
+                        <li class="@(Step >= 1 ? "done" : null)">@T("Sim.StepHmac")</li>
+                        <li class="@(Step >= 2 ? "done" : null)">@T("Sim.StepMap")</li>
+                        <li class="@(Step >= 3 ? "done" : null)">@T("Sim.StepSeal")</li>
+                        <li class="@(Step >= 4 ? "done" : null)">@T("Sim.StepCache")</li>
+                    </ul>
+                    @if (!string.IsNullOrEmpty(Fingerprint))
+                    {
+                        <p class="flow-fingerprint"><span>sha256</span> @Fingerprint</p>
+                    }
+                </div>
+                <button type="button" class="btn btn-primary flow-run" @onclick="RunAsync" disabled="@IsProcessing">
+                    @(IsProcessing ? T("Sim.Running") : T("Sim.Run"))
+                </button>
+            </div>
+
+            <div class="flow-col">
+                <h3 class="flow-col-title">@T("Sim.Mor")</h3>
+                <p class="flow-col-hint">@T("Sim.MorHint")</p>
+                <div class="flow-mor-toggle" role="tablist" aria-label="@T("Sim.MorAria")">
+                    @foreach (var mor in FlowSimulatorSamples.Mors)
+                    {
+                        var selected = SelectedMor == mor.Id;
+                        <button type="button"
+                                class="flow-mor @(selected ? "is-active" : null)"
+                                role="tab"
+                                aria-selected="@selected"
+                                @onclick="() => SelectMor(mor.Id)">
+                            @mor.Name
+                        </button>
+                    }
+                </div>
+                <div class="flow-delivery @(DeliveryReady ? "is-ready" : null)" aria-live="polite">
+                    @if (DeliveryReady)
+                    {
+                        <p class="flow-delivery-ok">@T("Sim.DeliveryReady")</p>
+                        <pre class="flow-payload"><code>@DeliveryJson</code></pre>
+                        <p class="flow-cache-hit">cache hit · O(1) · tenant=@CurrentSource.Tenant</p>
+                    }
+                    else
+                    {
+                        <p class="flow-delivery-idle">@string.Format(T("Sim.DeliveryIdle"), CurrentMor.Name)</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    /// <summary>
+    /// Baked from SSR parent so Interactive Server keeps ENG/ESP after circuit connect
+    /// (does not rely on Ambient CurrentUICulture alone).
+    /// </summary>
+    [Parameter] public string CultureCode { get; set; } = "es";
+
+    private string SelectedSource { get; set; } = "stripe";
+    private string SelectedMor { get; set; } = "holded";
+    private bool IsProcessing { get; set; }
+    private int Step { get; set; }
+    private string ProcessorStatus { get; set; } = "";
+    private string? Fingerprint { get; set; }
+    private bool DeliveryReady { get; set; }
+
+    private UiCulture ActiveCulture => UiCulture.ParseOrDefault(
+        string.IsNullOrWhiteSpace(CultureCode) ? L.Culture.Code : CultureCode);
+
+    private FlowSimulatorSamples.SourceDef[] Sources =>
+        FlowSimulatorSamples.GetSources(ActiveCulture);
+
+    private FlowSimulatorSamples.SourceDef CurrentSource =>
+        Sources.First(s => s.Id == SelectedSource);
+
+    private FlowSimulatorSamples.MorDef CurrentMor =>
+        FlowSimulatorSamples.Mors.First(m => m.Id == SelectedMor);
+
+    private string DeliveryJson =>
+        FlowSimulatorSamples.BuildPgcDraftJson(CurrentSource, CurrentMor, Fingerprint, ActiveCulture);
+
+    private string T(string key) => SiteCatalog.Get(ActiveCulture, key);
+
+    protected override void OnInitialized()
+    {
+        ApplyCulture();
+        ProcessorStatus = T("Sim.Ready");
+    }
+
+    protected override void OnParametersSet()
+    {
+        ApplyCulture();
+        // CultureCode is baked from SSR; if it changes after a language switch + remount, refresh idle copy.
+        if (!IsProcessing && !DeliveryReady && Step == 0)
+        {
+            ProcessorStatus = T("Sim.Ready");
+        }
+    }
+
+    private void ApplyCulture()
+    {
+        var info = ActiveCulture.ToCultureInfo();
+        System.Globalization.CultureInfo.CurrentCulture = info;
+        System.Globalization.CultureInfo.CurrentUICulture = info;
+    }
+
+    private void SelectSource(string id)
+    {
+        SelectedSource = id;
+        ResetDelivery();
+    }
+
+    private void SelectMor(string id)
+    {
+        SelectedMor = id;
+        if (!(DeliveryReady && !string.IsNullOrEmpty(Fingerprint)))
+        {
+            ResetDelivery();
+        }
+    }
+
+    private void ResetDelivery()
+    {
+        DeliveryReady = false;
+        Fingerprint = null;
+        Step = 0;
+        ProcessorStatus = T("Sim.Ready");
+    }
+
+    private async Task RunAsync()
+    {
+        if (IsProcessing)
+        {
+            return;
+        }
+
+        IsProcessing = true;
+        DeliveryReady = false;
+        Fingerprint = null;
+        Step = 0;
+        ProcessorStatus = T("Sim.StatusCompile");
+        StateHasChanged();
+
+        await Task.Delay(280);
+        Step = 1;
+        ProcessorStatus = T("Sim.StatusHmac");
+        StateHasChanged();
+
+        await Task.Delay(320);
+        Step = 2;
+        ProcessorStatus = T("Sim.StatusDto");
+        StateHasChanged();
+
+        await Task.Delay(300);
+        Step = 3;
+        Fingerprint = ComputeFingerprint(CurrentSource.Id, CurrentSource.EventType, CurrentSource.Amount);
+        ProcessorStatus = T("Sim.StatusSeal");
+        StateHasChanged();
+
+        await Task.Delay(280);
+        Step = 4;
+        ProcessorStatus = T("Sim.StatusCache");
+        DeliveryReady = true;
+        IsProcessing = false;
+    }
+
+    private static string ComputeFingerprint(string source, string eventType, string amount)
+    {
+        var input = source + "|" + eventType + "|" + amount + "|PGC/Draft/1";
+        var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+        var hash = System.Security.Cryptography.SHA256.HashData(bytes);
+        return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+}
