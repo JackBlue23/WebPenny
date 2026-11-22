@@ -118,26 +118,23 @@ internal static class SiteCatalog
             "<strong>Qué NO incluye:</strong> Pennymatch <strong>no es un ERP ni software de facturación</strong>: no emite facturas, no presenta modelos fiscales y no reemplaza Holded, Xero ni QuickBooks. Es middleware de partida doble hacia tu libro. La suscripción SaaS se cobra vía Lemon Squeezy (MoR activo; Paddle Billing v2 en contingencia).",
 
         // Pricing (aligned with Pennymatch Client TarifasCatalog)
-        ["Pricing.Kicker"] = "Precios",
-        ["Pricing.Title"] = "Elige el plan que protege tu conciliación",
-        ["Pricing.Lead"] =
-            "Topes de seguridad reales: 1.000, 5.000 y 20.000 transacciones al mes. El pago se completa en Stripe Checkout; Pennymatch no almacena datos de tarjeta.",
+        ["Pricing.Title"] = "Planes transparentes con topes de seguridad garantizados",
         ["Pricing.TrialNote"] =
             "Pruébalo gratis durante el primer mes. Se requiere tarjeta para activar la automatización mediante Stripe Checkout, pero puedes cancelar con un solo clic en cualquier momento antes del día 30.",
-        ["Pricing.GetStarted"] = "Empezar ahora",
+        ["Pricing.StartTrial"] = "Empezar prueba gratis",
+        ["Pricing.TrialHint"] = "30 días gratis · Sin cargos hoy",
         ["Pricing.BillingAria"] = "Ciclo de facturación",
         ["Pricing.CurrencyAria"] = "Moneda",
         ["Pricing.Monthly"] = "Mensual",
         ["Pricing.Yearly"] = "Anual",
-        ["Pricing.SaveBadge"] = "Ahorra 2 meses -17%",
+        ["Pricing.SaveBadge"] = "-17%",
         ["Pricing.CurrencyEur"] = "EUR (€)",
         ["Pricing.CurrencyUsd"] = "USD ($)",
         ["Pricing.PerMonth"] = "/ mes",
         ["Pricing.PerYear"] = "/ año",
         ["Pricing.Recommended"] = "Recomendado",
-        ["Pricing.TrialBadge"] = "Incluye 30 días de prueba gratis — Sin cargos hoy",
-        ["Pricing.RegionalNote"] =
-            "Precios regionalizados. Las suscripciones se procesan en la moneda local de tu pasarela de pago según la ubicación de tu empresa a través de Stripe.",
+        ["Pricing.Footnote"] =
+            "Todos los planes incluyen acceso al Asistente Penny IA (sujeto a Política de Uso Justo de 1.000 consultas/mes). Precios regionalizados según la moneda local de tu pasarela.",
         ["Pricing.Growth.Name"] = "Plan Growth",
         ["Pricing.Growth.Summary"] = "Ideal para tiendas en crecimiento.",
         ["Pricing.Growth.F1"] = "Hasta 1.000 transacciones/mes",
@@ -322,26 +319,23 @@ internal static class SiteCatalog
         ["Adv.Disclaimer"] =
             "<strong>What it is not:</strong> Pennymatch is <strong>not an ERP and not invoicing software</strong>: it does not issue invoices, file tax returns, or replace Xero, QuickBooks, or Holded. It is double-entry middleware into your books. The SaaS fee is billed via Lemon Squeezy (active MoR; Paddle Billing v2 as contingency).",
 
-        ["Pricing.Kicker"] = "Pricing",
-        ["Pricing.Title"] = "Choose the plan that protects your reconciliation",
-        ["Pricing.Lead"] =
-            "Real safety caps: 1,000, 5,000 and 20,000 transactions per month. Payment is completed in Stripe Checkout; Pennymatch does not store card data.",
+        ["Pricing.Title"] = "Transparent plans with guaranteed safety caps",
         ["Pricing.TrialNote"] =
             "Try it free for the first month. A card is required to activate automation via Stripe Checkout, but you can cancel in one click any time before day 30.",
-        ["Pricing.GetStarted"] = "Get started",
+        ["Pricing.StartTrial"] = "Start free trial",
+        ["Pricing.TrialHint"] = "30 days free · No charges today",
         ["Pricing.BillingAria"] = "Billing cycle",
         ["Pricing.CurrencyAria"] = "Currency",
         ["Pricing.Monthly"] = "Monthly",
         ["Pricing.Yearly"] = "Yearly",
-        ["Pricing.SaveBadge"] = "Save 2 months -17%",
+        ["Pricing.SaveBadge"] = "-17%",
         ["Pricing.CurrencyEur"] = "EUR (€)",
         ["Pricing.CurrencyUsd"] = "USD ($)",
         ["Pricing.PerMonth"] = "/ mo",
         ["Pricing.PerYear"] = "/ yr",
         ["Pricing.Recommended"] = "Recommended",
-        ["Pricing.TrialBadge"] = "Includes 30 days free trial — No charges today",
-        ["Pricing.RegionalNote"] =
-            "Regionalized pricing. Subscriptions are processed in your payment gateway’s local currency based on your company location via Stripe.",
+        ["Pricing.Footnote"] =
+            "All plans include access to the Penny AI Assistant (subject to a Fair Use Policy of 1,000 queries/month). Regionalized pricing according to your payment gateway’s local currency.",
         ["Pricing.Growth.Name"] = "Growth plan",
         ["Pricing.Growth.Summary"] = "Ideal for growing stores.",
         ["Pricing.Growth.F1"] = "Up to 1,000 transactions/month",

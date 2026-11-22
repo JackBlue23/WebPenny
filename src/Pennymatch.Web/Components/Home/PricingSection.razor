@@ -2,22 +2,15 @@
 @inject AuthLinkService Auth
 @inject ISiteLocalizer L
 
-<section class="section" id="precios" aria-labelledby="pricing-title">
+<section class="section pricing-section" id="precios" aria-labelledby="pricing-title">
     <div class="container">
-        <SectionHeading Id="pricing-title"
-                        Kicker="@L["Pricing.Kicker"]"
-                        Title="@L["Pricing.Title"]"
-                        Lead="@L["Pricing.Lead"]" />
+        <header class="pricing-header">
+            <h2 id="pricing-title" class="pricing-title">@L["Pricing.Title"]</h2>
+            <p class="pricing-subtitle">@L["Pricing.TrialNote"]</p>
+        </header>
 
-        <p class="pricing-trial-note">@L["Pricing.TrialNote"]</p>
-        <div class="hero-actions pricing-header-cta">
-            <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
-                @L["Pricing.GetStarted"]
-            </CtaButton>
-        </div>
-
-        <div class="pricing-toggles" role="group" aria-label="@L["Pricing.BillingAria"]">
-            <div class="pricing-toggle-row">
+        <div class="pricing-controls" role="group" aria-label="@L["Pricing.BillingAria"]">
+            <div class="pricing-segment" role="group" aria-label="@L["Pricing.BillingAria"]">
                 <button type="button"
                         class="pricing-chip @(!_yearly ? "is-active" : null)"
                         aria-pressed="@(!_yearly)"
@@ -30,9 +23,9 @@
                         @onclick="() => _yearly = true">
                     @L["Pricing.Yearly"]
                 </button>
-                <span class="badge">@L["Pricing.SaveBadge"]</span>
+                <span class="pricing-save">@L["Pricing.SaveBadge"]</span>
             </div>
-            <div class="pricing-toggle-row" role="group" aria-label="@L["Pricing.CurrencyAria"]">
+            <div class="pricing-segment" role="group" aria-label="@L["Pricing.CurrencyAria"]">
                 <button type="button"
                         class="pricing-chip @(_currencyUsd ? null : "is-active")"
                         aria-pressed="@(!_currencyUsd)"
@@ -51,35 +44,40 @@
         <div class="pricing-grid">
             @foreach (var plan in Plans)
             {
-                <article class="plan fintech-card-texture @(plan.Highlighted ? "featured" : null)">
-                    @if (plan.Highlighted)
-                    {
-                        <span class="plan-badge">@L["Pricing.Recommended"]</span>
-                    }
-                    <h3 class="plan-name">@L[plan.NameKey]</h3>
-                    <p class="plan-price">
-                        @PriceLabel(plan.Id)
-                        <span>@(_yearly ? L["Pricing.PerYear"] : L["Pricing.PerMonth"])</span>
-                    </p>
-                    <p>@L[plan.SummaryKey]</p>
-                    <ul class="plan-features">
-                        @foreach (var featureKey in plan.FeatureKeys)
+                var href = Auth.BuildPricingRegisterUrl(plan.Id, _yearly, _currencyUsd ? "USD" : "EUR");
+                <article class="plan @(plan.Highlighted ? "featured" : null)">
+                    <div class="plan-top">
+                        @if (plan.Highlighted)
                         {
-                            <li>@L[featureKey]</li>
+                            <span class="plan-badge">@L["Pricing.Recommended"]</span>
                         }
-                    </ul>
-                    <p class="plan-trial">@L["Pricing.TrialBadge"]</p>
-                    <CtaButton Href="@Auth.RegisterUrl"
-                               Variant="@(plan.Highlighted ? "primary" : "secondary")"
-                               Target="_blank"
-                               Rel="noopener noreferrer">
-                        @L["Pricing.GetStarted"]
-                    </CtaButton>
+                        <h3 class="plan-name">@L[plan.NameKey]</h3>
+                        <p class="plan-price">
+                            @PriceLabel(plan.Id)
+                            <span>@(_yearly ? L["Pricing.PerYear"] : L["Pricing.PerMonth"])</span>
+                        </p>
+                        <p class="plan-summary">@L[plan.SummaryKey]</p>
+                        <ul class="plan-features">
+                            @foreach (var featureKey in plan.FeatureKeys)
+                            {
+                                <li>@L[featureKey]</li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="plan-cta">
+                        <CtaButton Href="@href"
+                                   Variant="@(plan.Highlighted ? "primary" : "secondary")"
+                                   Target="_blank"
+                                   Rel="noopener noreferrer">
+                            @L["Pricing.StartTrial"]
+                        </CtaButton>
+                        <p class="plan-trial-hint">@L["Pricing.TrialHint"]</p>
+                    </div>
                 </article>
             }
         </div>
 
-        <p class="pricing-regional">@L["Pricing.RegionalNote"]</p>
+        <p class="pricing-footnote">@L["Pricing.Footnote"]</p>
     </div>
 </section>
 

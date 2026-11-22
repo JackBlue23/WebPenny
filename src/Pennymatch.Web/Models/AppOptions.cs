@@ -35,6 +35,14 @@ public sealed class AppOptions
     public string RegisterPath { get; set; } = "/login?returnUrl=dashboard";
 
     /// <summary>
+    /// Pricing-card checkout path under <see cref="ProductBaseUrl"/>.
+    /// Query params <c>plan</c>, <c>interval</c>, and <c>currency</c> are appended by
+    /// <c>AuthLinkService.BuildPricingRegisterUrl</c>. Override in QA/Prod if Client
+    /// still lacks <c>/register</c> (e.g. temporary login fallback).
+    /// </summary>
+    public string PricingRegisterPath { get; set; } = "/register";
+
+    /// <summary>
     /// Secondary CTA target. Absolute URL, path under ProductBaseUrl, site-relative path (/docs),
     /// page anchor (#...), or mailto:. Default: integration manuals hub.
     /// </summary>

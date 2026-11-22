@@ -43,6 +43,29 @@ public sealed class AuthLinkService
         DemoUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase)
         || DemoUrl.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Pricing CTA: <c>{ProductBaseUrl}{PricingRegisterPath}?plan=&amp;interval=&amp;currency=</c>.
+    /// </summary>
+    public string BuildPricingRegisterUrl(string plan, bool yearly, string currency)
+    {
+        var path = string.IsNullOrWhiteSpace(_options.PricingRegisterPath)
+            ? "/register"
+            : _options.PricingRegisterPath.Trim();
+
+        var interval = yearly ? "yearly" : "monthly";
+        var planValue = string.IsNullOrWhiteSpace(plan) ? "growth" : plan.Trim().ToLowerInvariant();
+        var currencyValue = string.IsNullOrWhiteSpace(currency)
+            ? "EUR"
+            : currency.Trim().ToUpperInvariant();
+
+        // Path may already include a query (QA fallback). Append with & or ?.
+        var baseUrl = Combine(ProductBaseUrl, path);
+        var separator = baseUrl.Contains('?', StringComparison.Ordinal) ? "&" : "?";
+        return $"{baseUrl}{separator}plan={Uri.EscapeDataString(planValue)}"
+               + $"&interval={Uri.EscapeDataString(interval)}"
+               + $"&currency={Uri.EscapeDataString(currencyValue)}";
+    }
+
     public string BuildLoginUrl(bool includeReturnUrl = true, string? returnUrl = null)
     {
         var path = _options.LoginPath;
