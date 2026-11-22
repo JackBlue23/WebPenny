@@ -1,125 +1,141 @@
+@rendermode InteractiveServer
 @inject AuthLinkService Auth
+@inject ISiteLocalizer L
 
 <section class="section" id="precios" aria-labelledby="pricing-title">
     <div class="container">
-        <SectionHeading Kicker="Precios"
-                        Title="Planes para equipos que mueven valor"
-                        Lead="Empieza con el ledger esencial y escala a enterprise con SLA, SSO y soporte dedicado." />
+        <SectionHeading Id="pricing-title"
+                        Kicker="@L["Pricing.Kicker"]"
+                        Title="@L["Pricing.Title"]"
+                        Lead="@L["Pricing.Lead"]" />
+
+        <p class="pricing-trial-note">@L["Pricing.TrialNote"]</p>
+        <div class="hero-actions pricing-header-cta">
+            <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
+                @L["Pricing.GetStarted"]
+            </CtaButton>
+        </div>
+
+        <div class="pricing-toggles" role="group" aria-label="@L["Pricing.BillingAria"]">
+            <div class="pricing-toggle-row">
+                <button type="button"
+                        class="pricing-chip @(!_yearly ? "is-active" : null)"
+                        aria-pressed="@(!_yearly)"
+                        @onclick="() => _yearly = false">
+                    @L["Pricing.Monthly"]
+                </button>
+                <button type="button"
+                        class="pricing-chip @(_yearly ? "is-active" : null)"
+                        aria-pressed="@_yearly"
+                        @onclick="() => _yearly = true">
+                    @L["Pricing.Yearly"]
+                </button>
+                <span class="badge">@L["Pricing.SaveBadge"]</span>
+            </div>
+            <div class="pricing-toggle-row" role="group" aria-label="@L["Pricing.CurrencyAria"]">
+                <button type="button"
+                        class="pricing-chip @(_currencyUsd ? null : "is-active")"
+                        aria-pressed="@(!_currencyUsd)"
+                        @onclick="() => _currencyUsd = false">
+                    @L["Pricing.CurrencyEur"]
+                </button>
+                <button type="button"
+                        class="pricing-chip @(_currencyUsd ? "is-active" : null)"
+                        aria-pressed="@_currencyUsd"
+                        @onclick="() => _currencyUsd = true">
+                    @L["Pricing.CurrencyUsd"]
+                </button>
+            </div>
+        </div>
 
         <div class="pricing-grid">
             @foreach (var plan in Plans)
             {
-                var href = plan.Highlighted ? Auth.RegisterUrl : Auth.DemoUrl;
-                var external = plan.Highlighted || Auth.DemoOpensExternally;
                 <article class="plan fintech-card-texture @(plan.Highlighted ? "featured" : null)">
-                    <h3 class="plan-name">@plan.Name</h3>
-                    <p class="plan-price">@plan.PriceLabel <span>@plan.Cadence</span></p>
-                    <p>@plan.Summary</p>
+                    @if (plan.Highlighted)
+                    {
+                        <span class="plan-badge">@L["Pricing.Recommended"]</span>
+                    }
+                    <h3 class="plan-name">@L[plan.NameKey]</h3>
+                    <p class="plan-price">
+                        @PriceLabel(plan.Id)
+                        <span>@(_yearly ? L["Pricing.PerYear"] : L["Pricing.PerMonth"])</span>
+                    </p>
+                    <p>@L[plan.SummaryKey]</p>
                     <ul class="plan-features">
-                        @foreach (var feature in plan.Features)
+                        @foreach (var featureKey in plan.FeatureKeys)
                         {
-                            <li>@feature</li>
+                            <li>@L[featureKey]</li>
                         }
                     </ul>
-                    <CtaButton Href="@href"
+                    <p class="plan-trial">@L["Pricing.TrialBadge"]</p>
+                    <CtaButton Href="@Auth.RegisterUrl"
                                Variant="@(plan.Highlighted ? "primary" : "secondary")"
-                               Target="@(external ? "_blank" : null)"
-                               Rel="@(external ? "noopener noreferrer" : null)">
-                        @plan.CtaLabel
+                               Target="_blank"
+                               Rel="noopener noreferrer">
+                        @L["Pricing.GetStarted"]
                     </CtaButton>
                 </article>
             }
         </div>
-    </div>
-</section>
 
-<section class="section" id="demo" aria-labelledby="demo-title">
-    <div class="container section-panel fintech-card-texture">
-        <SectionHeading Id="demo-title"
-                        Kicker="Demo"
-                        Title="Solicita una demo del ledger en tu stack"
-                        Lead="Cuéntanos tu caso de pagos o liquidaciones. Ajustaremos ProductBaseUrl al puerto real de Pennymatch.Client cuando lo confirméis." />
-        <div class="hero-actions">
-            <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
-                Crear cuenta
-            </CtaButton>
-            <CtaButton Href="mailto:demo@pennymatch.com?subject=Solicitar%20demo%20Pennymatch" Variant="secondary">
-                Escribir a ventas
-            </CtaButton>
-        </div>
-    </div>
-</section>
-
-<section class="section" id="docs" aria-labelledby="docs-title">
-    <div class="container">
-        <SectionHeading Kicker="Docs"
-                        Title="Documentación orientada a integración"
-                        Lead="@($"Guías de ledger, webhooks firmados y modelos de autorización. El detalle de endpoints vive en tu entorno de producto. API local: {Auth.ApiBaseUrl}")" />
-        <div class="hero-actions">
-            <CtaButton Href="/blog" Variant="secondary">Leer el blog técnico</CtaButton>
-            <CtaButton Href="@Auth.DemoUrl"
-                       Variant="primary"
-                       Target="@(Auth.DemoOpensExternally ? "_blank" : null)"
-                       Rel="@(Auth.DemoOpensExternally ? "noopener noreferrer" : null)">
-                Hablar con ventas
-            </CtaButton>
-        </div>
+        <p class="pricing-regional">@L["Pricing.RegionalNote"]</p>
     </div>
 </section>
 
 @code {
-    private static readonly IReadOnlyList<PricingPlan> Plans =
+    private bool _yearly;
+    private bool _currencyUsd;
+
+    private static readonly PlanCard[] Plans =
     [
-        new()
-        {
-            Id = "starter",
-            Name = "Starter",
-            PriceLabel = "€0",
-            Cadence = "/ mes en sandbox",
-            Summary = "Para prototipar asientos y webhooks en desarrollo.",
-            Features =
-            [
-                "Ledger sandbox",
-                "Hasta 2 tenants de prueba",
-                "Webhooks firmados",
-                "Soporte por comunidad"
-            ],
-            CtaLabel = "Solicitar acceso",
-            Highlighted = false
-        },
-        new()
-        {
-            Id = "pro",
-            Name = "Pro",
-            PriceLabel = "€499",
-            Cadence = "/ mes",
-            Summary = "Producción para fintechs en crecimiento.",
-            Features =
-            [
-                "Ledger en producción",
-                "Tenants ilimitados",
-                "RBAC + auditoría",
-                "SLA 99,9%"
-            ],
-            CtaLabel = "Registrarse",
-            Highlighted = true
-        },
-        new()
-        {
-            Id = "enterprise",
-            Name = "Enterprise",
-            PriceLabel = "A medida",
-            Cadence = "",
-            Summary = "Despliegues exigentes con compliance y soporte 24/7.",
-            Features =
-            [
-                "SSO / SAML",
-                "Residencia de datos",
-                "Soporte dedicado",
-                "Contrato y DPA"
-            ],
-            CtaLabel = "Hablar con ventas",
-            Highlighted = false
-        }
+        new("growth", "Pricing.Growth.Name", "Pricing.Growth.Summary", false,
+        [
+            "Pricing.Growth.F1",
+            "Pricing.Growth.F2",
+            "Pricing.Growth.F3",
+            "Pricing.Growth.F4",
+            "Pricing.Growth.F5"
+        ]),
+        new("pro", "Pricing.Pro.Name", "Pricing.Pro.Summary", true,
+        [
+            "Pricing.Pro.F1",
+            "Pricing.Pro.F2",
+            "Pricing.Pro.F3",
+            "Pricing.Pro.F4",
+            "Pricing.Pro.F5"
+        ]),
+        new("enterprise", "Pricing.Enterprise.Name", "Pricing.Enterprise.Summary", false,
+        [
+            "Pricing.Enterprise.F1",
+            "Pricing.Enterprise.F2",
+            "Pricing.Enterprise.F3",
+            "Pricing.Enterprise.F4",
+            "Pricing.Enterprise.F5"
+        ])
     ];
+
+    private string PriceLabel(string planId) => (planId, _currencyUsd, _yearly) switch
+    {
+        ("growth", false, false) => "79 €",
+        ("growth", true, false) => "$89",
+        ("growth", false, true) => "790 €",
+        ("growth", true, true) => "$890",
+        ("pro", false, false) => "199 €",
+        ("pro", true, false) => "$219",
+        ("pro", false, true) => "1.990 €",
+        ("pro", true, true) => "$2,190",
+        ("enterprise", false, false) => "399 €",
+        ("enterprise", true, false) => "$439",
+        ("enterprise", false, true) => "3.990 €",
+        ("enterprise", true, true) => "$4,390",
+        _ => _currencyUsd ? "$0" : "0 €"
+    };
+
+    private sealed record PlanCard(
+        string Id,
+        string NameKey,
+        string SummaryKey,
+        bool Highlighted,
+        string[] FeatureKeys);
 }

@@ -1132,6 +1132,58 @@ code {
 }
 
 /* ---------- Pricing ---------- */
+.pricing-trial-note {
+  max-width: 46rem;
+  margin: 0 auto 1.25rem;
+  text-align: center;
+  color: var(--pm-text-muted);
+  font-size: var(--pm-text-sm);
+  line-height: 1.55;
+}
+
+.pricing-header-cta {
+  justify-content: center;
+  margin-bottom: 1.75rem;
+}
+
+.pricing-toggles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+}
+
+.pricing-toggle-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.35rem;
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius-pill);
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.pricing-chip {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--pm-text-muted);
+  font: inherit;
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+  padding: 0.4rem 0.95rem;
+  border-radius: var(--pm-radius-pill);
+  cursor: pointer;
+}
+
+.pricing-chip.is-active {
+  background: var(--pm-brand-accent);
+  color: #042f2e;
+}
+
 .pricing-grid {
   display: grid;
   gap: 1.5rem;
@@ -1145,6 +1197,7 @@ code {
 }
 
 .plan {
+  position: relative;
   padding: 1.75rem 1.5rem;
   border: 1px solid var(--pm-border);
   border-radius: var(--pm-radius-lg);
@@ -1155,6 +1208,40 @@ code {
   transition: border-color var(--pm-duration) ease,
     transform var(--pm-duration-slow) var(--pm-ease),
     box-shadow var(--pm-duration-slow) var(--pm-ease);
+}
+
+.plan-badge {
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--pm-radius-pill);
+  padding: 0.2rem 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(90deg, #10b981, #0d9488);
+}
+
+.plan-trial {
+  margin: 0;
+  text-align: center;
+  font-size: var(--pm-text-sm);
+  font-weight: 600;
+  color: var(--pm-brand-accent);
+}
+
+.pricing-regional {
+  margin: 1.75rem auto 0;
+  max-width: 42rem;
+  text-align: center;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--pm-text-muted);
 }
 
 .plan:hover {
