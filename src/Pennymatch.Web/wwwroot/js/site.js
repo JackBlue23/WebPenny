@@ -28,9 +28,35 @@
 
   // Language switch: keep pathname/query/hash + scrollY across /culture/set full reload.
   // Destination is ALWAYS read from window.location at click time — never a stale SSR href.
+  // Hard navigation (location.assign) is required so InteractiveServer islands remount
+  // with the new culture cookie — Blazor enhanced nav alone leaves pricing/sim on the old lang.
   const LANG_SCROLL_KEY = "penny.lang.scroll";
+  const PRICING_BILLING_KEY = "penny.pricing.billing";
   const CULTURE_COOKIE = ".AspNetCore.Culture";
   let pendingScroll = null;
+
+  window.pennyPricingBilling = {
+    save(yearly, currency) {
+      try {
+        sessionStorage.setItem(
+          PRICING_BILLING_KEY,
+          JSON.stringify({
+            yearly: !!yearly,
+            currency: String(currency || "EUR").toUpperCase() === "USD" ? "USD" : "EUR"
+          })
+        );
+      } catch {
+        /* private mode / quota */
+      }
+    },
+    load() {
+      try {
+        return sessionStorage.getItem(PRICING_BILLING_KEY);
+      } catch {
+        return null;
+      }
+    }
+  };
 
   try {
     if ("scrollRestoration" in history) {
@@ -187,15 +213,22 @@
 
   /**
    * Capture-phase for [data-lang-set] anchors/buttons.
-   * - Different culture: rewrite href from live location, clear cookies, save scroll,
-   *   then let the browser follow the GET (no preventDefault on <a>) so a stale
-   *   site.js / failed assign can never trap the user on ENG.
+   * - Different culture: rewrite href from live location (pathname+search+hash),
+   *   clear cookies, save scroll, then hard-navigate via location.assign so the
+   *   whole SSR document + InteractiveServer islands remount with the new cookie.
+   *   data-enhance-nav="false" is also set in markup; assign is belt-and-suspenders
+   *   against Blazor soft navigation. Href stays correct for middle-click / no-JS.
    * - Same culture: preventDefault + close menu only.
-   * No _busy. No Blazor.
+   * No _busy.
    */
   document.addEventListener(
     "click",
     (event) => {
+      // Modified clicks (new tab / window) keep native <a> behavior.
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
       const el = event.target?.closest?.("[data-lang-set]");
       if (!el) {
         const legacy = event.target?.closest?.("a[data-lang-preserve]");
@@ -209,8 +242,10 @@
         }
         window.pennyLangSwitch.savePosition();
         clearCultureCookies();
-        legacy.setAttribute("href", buildCultureUrl(code));
-        // Native navigation — do not preventDefault.
+        const url = buildCultureUrl(code);
+        legacy.setAttribute("href", url);
+        event.preventDefault();
+        window.location.assign(url);
         return;
       }
 
@@ -227,11 +262,10 @@
 
       if (el.tagName === "A") {
         el.setAttribute("href", url);
-        // Critical: do NOT preventDefault — plain GET must proceed even if assign fails.
-        return;
+        el.setAttribute("data-enhance-nav", "false");
       }
 
-      // Button fallback (older markup): navigate in JS.
+      // Hard navigation — full document load applies .AspNetCore.Culture server-side.
       event.preventDefault();
       window.location.assign(url);
     },

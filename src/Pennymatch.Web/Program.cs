@@ -127,6 +127,10 @@ app.MapGet("/culture/set", (string? culture, string? returnUrl, HttpContext http
             Path = "/"
         });
 
+    // Never let intermediaries / enhanced-nav caches serve a stale-language document.
+    http.Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+    http.Response.Headers.Pragma = "no-cache";
+
     var target = SanitizeReturnUrl(returnUrl);
     return Results.LocalRedirect(target);
 });

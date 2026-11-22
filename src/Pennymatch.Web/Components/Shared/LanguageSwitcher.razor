@@ -5,6 +5,10 @@
   Plain GET <a href="/culture/set?..."> so language ALWAYS switches even when
   site.js is stale/missing or Blazor is down. JS only rewrites returnUrl from
   live location + saves scroll (see pennyLangSwitch).
+
+  data-enhance-nav="false" is required: Blazor enhanced navigation soft-patches
+  the document after /culture/set and leaves InteractiveServer islands (Pricing,
+  Simulator) + often the chrome on the previous culture until a hard F5.
 *@
 <details class="lang-switch" data-lang-switch>
     <summary class="lang-switch-summary" aria-label="@L["Lang.Switch"]">
@@ -26,6 +30,7 @@
            lang="es"
            hreflang="es"
            data-lang-set="es"
+           data-enhance-nav="false"
            aria-current="@(L.Culture.Code == "es" ? "true" : null)">@L["Lang.Esp"]</a>
         <a href="@CultureHref("en")"
            class="lang-switch-option @(L.Culture.Code == "en" ? "is-active" : null)"
@@ -33,6 +38,7 @@
            lang="en"
            hreflang="en"
            data-lang-set="en"
+           data-enhance-nav="false"
            aria-current="@(L.Culture.Code == "en" ? "true" : null)">@L["Lang.Eng"]</a>
     </div>
 </details>

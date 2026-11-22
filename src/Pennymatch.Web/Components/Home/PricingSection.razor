@@ -1,42 +1,43 @@
 @rendermode InteractiveServer
 @inject AuthLinkService Auth
 @inject ISiteLocalizer L
+@inject IJSRuntime JS
 
 <section class="section pricing-section" id="precios" aria-labelledby="pricing-title">
     <div class="container">
         <header class="pricing-header">
-            <h2 id="pricing-title" class="pricing-title">@L["Pricing.Title"]</h2>
-            <p class="pricing-subtitle">@L["Pricing.TrialNote"]</p>
+            <h2 id="pricing-title" class="pricing-title">@T("Pricing.Title")</h2>
+            <p class="pricing-subtitle">@T("Pricing.TrialNote")</p>
         </header>
 
-        <div class="pricing-controls" role="group" aria-label="@L["Pricing.BillingAria"]">
-            <div class="pricing-segment" role="group" aria-label="@L["Pricing.BillingAria"]">
+        <div class="pricing-controls" role="group" aria-label="@T("Pricing.BillingAria")">
+            <div class="pricing-segment" role="group" aria-label="@T("Pricing.BillingAria")">
                 <button type="button"
                         class="pricing-chip @(!_yearly ? "is-active" : null)"
                         aria-pressed="@(!_yearly)"
-                        @onclick="() => _yearly = false">
-                    @L["Pricing.Monthly"]
+                        @onclick="() => SetYearlyAsync(false)">
+                    @T("Pricing.Monthly")
                 </button>
                 <button type="button"
                         class="pricing-chip @(_yearly ? "is-active" : null)"
                         aria-pressed="@_yearly"
-                        @onclick="() => _yearly = true">
-                    @L["Pricing.Yearly"]
+                        @onclick="() => SetYearlyAsync(true)">
+                    @T("Pricing.Yearly")
                 </button>
-                <span class="pricing-save">@L["Pricing.SaveBadge"]</span>
+                <span class="pricing-save">@T("Pricing.SaveBadge")</span>
             </div>
-            <div class="pricing-segment" role="group" aria-label="@L["Pricing.CurrencyAria"]">
+            <div class="pricing-segment" role="group" aria-label="@T("Pricing.CurrencyAria")">
                 <button type="button"
                         class="pricing-chip @(_currencyUsd ? null : "is-active")"
                         aria-pressed="@(!_currencyUsd)"
-                        @onclick="() => _currencyUsd = false">
-                    @L["Pricing.CurrencyEur"]
+                        @onclick="() => SetCurrencyUsdAsync(false)">
+                    @T("Pricing.CurrencyEur")
                 </button>
                 <button type="button"
                         class="pricing-chip @(_currencyUsd ? "is-active" : null)"
                         aria-pressed="@_currencyUsd"
-                        @onclick="() => _currencyUsd = true">
-                    @L["Pricing.CurrencyUsd"]
+                        @onclick="() => SetCurrencyUsdAsync(true)">
+                    @T("Pricing.CurrencyUsd")
                 </button>
             </div>
         </div>
@@ -49,18 +50,18 @@
                     <div class="plan-top">
                         @if (plan.Highlighted)
                         {
-                            <span class="plan-badge">@L["Pricing.Recommended"]</span>
+                            <span class="plan-badge">@T("Pricing.Recommended")</span>
                         }
-                        <h3 class="plan-name">@L[plan.NameKey]</h3>
+                        <h3 class="plan-name">@T(plan.NameKey)</h3>
                         <p class="plan-price">
                             @PriceLabel(plan.Id)
-                            <span>@(_yearly ? L["Pricing.PerYear"] : L["Pricing.PerMonth"])</span>
+                            <span>@(_yearly ? T("Pricing.PerYear") : T("Pricing.PerMonth"))</span>
                         </p>
-                        <p class="plan-summary">@L[plan.SummaryKey]</p>
+                        <p class="plan-summary">@T(plan.SummaryKey)</p>
                         <ul class="plan-features">
                             @foreach (var featureKey in plan.FeatureKeys)
                             {
-                                <li>@L[featureKey]</li>
+                                <li>@T(featureKey)</li>
                             }
                         </ul>
                     </div>
@@ -69,21 +70,33 @@
                                    Variant="@(plan.Highlighted ? "primary" : "secondary")"
                                    Target="_blank"
                                    Rel="noopener noreferrer">
-                            @L["Pricing.StartTrial"]
+                            @T("Pricing.StartTrial")
                         </CtaButton>
-                        <p class="plan-trial-hint">@L["Pricing.TrialHint"]</p>
+                        <p class="plan-trial-hint">@T("Pricing.TrialHint")</p>
                     </div>
                 </article>
             }
         </div>
 
-        <p class="pricing-footnote">@L["Pricing.Footnote"]</p>
+        <p class="pricing-footnote">@T("Pricing.Footnote")</p>
     </div>
 </section>
 
 @code {
+    /// <summary>
+    /// Baked from SSR parent so Interactive Server keeps ENG/ESP after circuit connect
+    /// (does not rely on ambient CurrentUICulture / scoped SiteLocalizer alone).
+    /// </summary>
+    [Parameter] public string CultureCode { get; set; } = "es";
+
     private bool _yearly;
     private bool _currencyUsd;
+    private bool _billingHydrated;
+
+    private UiCulture ActiveCulture => UiCulture.ParseOrDefault(
+        string.IsNullOrWhiteSpace(CultureCode) ? L.Culture.Code : CultureCode);
+
+    private string T(string key) => SiteCatalog.Get(ActiveCulture, key);
 
     private static readonly PlanCard[] Plans =
     [
@@ -112,6 +125,101 @@
             "Pricing.Enterprise.F5"
         ])
     ];
+
+    protected override void OnInitialized()
+    {
+        ApplyCulture();
+    }
+
+    protected override void OnParametersSet()
+    {
+        ApplyCulture();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _billingHydrated)
+        {
+            return;
+        }
+
+        _billingHydrated = true;
+        try
+        {
+            var raw = await JS.InvokeAsync<string?>("pennyPricingBilling.load");
+            if (!string.IsNullOrWhiteSpace(raw)
+                && raw.Contains('"')
+                && TryParseBilling(raw, out var yearly, out var usd))
+            {
+                _yearly = yearly;
+                _currencyUsd = usd;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (JSException)
+        {
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+
+    private async Task SetYearlyAsync(bool yearly)
+    {
+        _yearly = yearly;
+        await PersistBillingAsync();
+    }
+
+    private async Task SetCurrencyUsdAsync(bool usd)
+    {
+        _currencyUsd = usd;
+        await PersistBillingAsync();
+    }
+
+    private async Task PersistBillingAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync(
+                "pennyPricingBilling.save",
+                _yearly,
+                _currencyUsd ? "USD" : "EUR");
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (JSException)
+        {
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+
+    private void ApplyCulture()
+    {
+        var info = ActiveCulture.ToCultureInfo();
+        System.Globalization.CultureInfo.CurrentCulture = info;
+        System.Globalization.CultureInfo.CurrentUICulture = info;
+    }
+
+    private static bool TryParseBilling(string raw, out bool yearly, out bool usd)
+    {
+        yearly = false;
+        usd = false;
+        // Tiny parser: {"yearly":true,"currency":"USD"} — avoids System.Text.Json dependency in WASM-less SSR island.
+        var y = raw.Contains("\"yearly\":true", StringComparison.OrdinalIgnoreCase)
+                || raw.Contains("\"yearly\": true", StringComparison.OrdinalIgnoreCase);
+        var u = raw.Contains("\"currency\":\"USD\"", StringComparison.OrdinalIgnoreCase)
+                || raw.Contains("\"currency\": \"USD\"", StringComparison.OrdinalIgnoreCase);
+        yearly = y;
+        usd = u;
+        return y || u || raw.Contains("\"yearly\":false", StringComparison.OrdinalIgnoreCase)
+               || raw.Contains("\"currency\":\"EUR\"", StringComparison.OrdinalIgnoreCase);
+    }
 
     private string PriceLabel(string planId) => (planId, _currencyUsd, _yearly) switch
     {

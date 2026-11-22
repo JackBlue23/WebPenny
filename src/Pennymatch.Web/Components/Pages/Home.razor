@@ -12,8 +12,8 @@
 </HeadContent>
 
 <HeroSection />
-<FlowSimulator CultureCode="@L.Culture.Code" />
+<FlowSimulator @key="@($"sim-{L.Culture.Code}")" CultureCode="@L.Culture.Code" />
 <AdvantagesSection />
-<PricingSection />
+<PricingSection @key="@($"pricing-{L.Culture.Code}")" CultureCode="@L.Culture.Code" />
 <DocsTeaserSection />
 <CtaBandSection />
