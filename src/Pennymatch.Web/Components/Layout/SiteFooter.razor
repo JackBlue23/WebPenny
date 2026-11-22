@@ -1,4 +1,5 @@
 @inject AuthLinkService Auth
+@inject ISiteLocalizer L
 
 <footer class="site-footer">
     <div class="container">
@@ -8,28 +9,39 @@
                     <span class="nav-logo-mark" aria-hidden="true">P</span>
                     <span>Pennymatch</span>
                 </a>
-                <p style="margin-top:0.85rem;max-width:28ch;">
-                    Ledger API de partida doble, webhooks financieros y seguridad multi-tenant para productos B2B.
+                <p style="margin-top:0.85rem;max-width:32ch;">
+                    @L["Footer.Blurb"]
                 </p>
             </div>
             <div>
-                <h2>Producto</h2>
+                <h2>@L["Footer.Product"]</h2>
                 <ul>
-                    <li><a href="/#caracteristicas">Características</a></li>
-                    <li><a href="/#precios">Precios</a></li>
-                    <li><a href="/#docs">Docs</a></li>
-                    <li><a href="@Auth.DemoUrl">Solicitar demo</a></li>
+                    <li><a href="/#simulador">@L["Nav.Simulator"]</a></li>
+                    <li><a href="/#ventajas">@L["Nav.Advantages"]</a></li>
+                    <li><a href="/docs">@L["Footer.Manuals"]</a></li>
+                    <li><a href="@Auth.RegisterUrl" target="_blank" rel="noopener noreferrer">@L["Footer.Trial"]</a></li>
                 </ul>
             </div>
             <div>
-                <h2>Recursos</h2>
+                <h2>@L["Footer.Resources"]</h2>
                 <ul>
-                    <li><a href="/blog">Blog</a></li>
-                    <li><a href="@Auth.LoginUrl" target="_blank" rel="noopener noreferrer">Iniciar sesión</a></li>
-                    <li><a href="@Auth.RegisterUrl" target="_blank" rel="noopener noreferrer">Registrarse</a></li>
+                    <li><a href="/blog">@L["Nav.Blog"]</a></li>
+                    <li><a href="/docs">@L["Nav.Docs"]</a></li>
+                    <li><a href="@Auth.LoginUrl" target="_blank" rel="noopener noreferrer">@L["Footer.Login"]</a></li>
+                    <li><a href="@Auth.RegisterUrl" target="_blank" rel="noopener noreferrer">@L["Footer.Register"]</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>@L["Footer.Legal"]</h2>
+                <ul>
+                    <li><a href="/legal-notice">@L["Footer.LegalNotice"]</a></li>
+                    <li><a href="/privacy">@L["Footer.Privacy"]</a></li>
+                    <li><a href="/terms">@L["Footer.Terms"]</a></li>
+                    <li><a href="/cookies">@L["Footer.Cookies"]</a></li>
+                    <li><a href="/subprocessors">@L["Footer.Subprocessors"]</a></li>
                 </ul>
             </div>
         </div>
-        <p class="footer-copy">© @DateTime.UtcNow.Year Pennymatch. Todos los derechos reservados.</p>
+        <p class="footer-copy">@string.Format(L["Footer.Copy"], DateTime.UtcNow.Year)</p>
     </div>
 </footer>

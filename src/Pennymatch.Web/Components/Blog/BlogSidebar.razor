@@ -1,6 +1,8 @@
-<aside class="sidebar" aria-label="Contenido relacionado">
+@inject ISiteLocalizer L
+
+<aside class="sidebar" aria-label="@L["Blog.SidebarAria"]">
     <div>
-        <h2>Recomendados</h2>
+        <h2>@L["Blog.Recommended"]</h2>
         <ul class="sidebar-list">
             @foreach (var post in Posts)
             {

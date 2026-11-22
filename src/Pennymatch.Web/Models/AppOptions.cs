@@ -19,15 +19,34 @@ public sealed class AppOptions
     /// </summary>
     public string ProductBaseUrl { get; set; } = "http://localhost:5288";
 
-    /// <summary>Client login path. May include query stub like /login?returnUrl=</summary>
-    public string LoginPath { get; set; } = "/login?returnUrl=";
+    /// <summary>
+    /// Public production origin for canonical, hreflang, Open Graph and sitemap.
+    /// Must never be localhost — SEO tags fall back to https://pennymatch.com.
+    /// </summary>
+    public string PublicBaseUrl { get; set; } = "https://pennymatch.com";
 
-    public string RegisterPath { get; set; } = "/register";
+    /// <summary>Client login path. Prefer a concrete returnUrl (e.g. /login?returnUrl=dashboard).</summary>
+    public string LoginPath { get; set; } = "/login?returnUrl=dashboard";
 
     /// <summary>
-    /// Demo CTA target. Absolute URL, path under ProductBaseUrl, page anchor (#...), or mailto:.
+    /// Primary product CTA path. Points at Client login with dashboard return
+    /// (blank /auth/register is avoided until Client register ships).
     /// </summary>
-    public string DemoPath { get; set; } = "#demo";
+    public string RegisterPath { get; set; } = "/login?returnUrl=dashboard";
+
+    /// <summary>
+    /// Pricing-card checkout path under <see cref="ProductBaseUrl"/>.
+    /// Query params <c>plan</c>, <c>interval</c>, and <c>currency</c> are appended by
+    /// <c>AuthLinkService.BuildPricingRegisterUrl</c>. Override in QA/Prod if Client
+    /// still lacks <c>/register</c> (e.g. temporary login fallback).
+    /// </summary>
+    public string PricingRegisterPath { get; set; } = "/register";
+
+    /// <summary>
+    /// Secondary CTA target. Absolute URL, path under ProductBaseUrl, site-relative path (/docs),
+    /// page anchor (#...), or mailto:. Default: integration manuals hub.
+    /// </summary>
+    public string DemoPath { get; set; } = "/docs";
 
     /// <summary>
     /// Optional cookie name shared with the product app when both are same-site.

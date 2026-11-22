@@ -1,0 +1,60 @@
+@page "/docs"
+@page "/manuales"
+@inject DocsCatalogService Docs
+@inject AuthLinkService Auth
+@inject ISiteLocalizer L
+
+<PageTitle>@L["Docs.Title"]</PageTitle>
+<HeadContent>
+    <SeoTags Title="@L["Docs.Title"]"
+             Description="@L["Docs.Description"]"
+             OgDescription="@L["Docs.OgDescription"]"
+             Path="/docs" />
+</HeadContent>
+
+<section class="page-hero">
+    <div class="container">
+        <p class="section-kicker">@L["Docs.Kicker"]</p>
+        <h1>@L["Docs.Heading"]</h1>
+        <p class="section-lead" style="max-width:48ch;">
+            @L["Docs.Lead"]
+        </p>
+        <div class="hero-actions" style="margin-top:1.25rem;">
+            <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
+                @L["Hero.CtaRegister"]
+            </CtaButton>
+            <CtaButton Href="/" Variant="secondary">@L["Docs.BackHome"]</CtaButton>
+        </div>
+    </div>
+</section>
+
+<section class="section" style="padding-top:0;" aria-label="@L["Docs.CatalogAria"]">
+    <div class="container">
+        <div class="docs-grid docs-grid-full">
+            @foreach (var manual in _manuals)
+            {
+                <a class="docs-card fintech-card-texture" href="@manual.Href">
+                    <span class="docs-card-cat">@manual.Category</span>
+                    <h3>@manual.Title</h3>
+                    <p>@manual.Summary</p>
+                    <div class="docs-card-tags">
+                        @foreach (var tag in manual.Tags)
+                        {
+                            <span class="badge">@tag</span>
+                        }
+                    </div>
+                    <span class="docs-card-meta">@manual.Audience</span>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private IReadOnlyList<DocManual> _manuals = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _manuals = await Docs.GetAllAsync();
+    }
+}

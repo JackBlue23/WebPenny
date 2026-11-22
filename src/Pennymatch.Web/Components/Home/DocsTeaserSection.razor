@@ -1,0 +1,40 @@
+@inject DocsCatalogService Docs
+@inject AuthLinkService Auth
+@inject ISiteLocalizer L
+
+<section class="section" id="docs" aria-labelledby="docs-teaser-title">
+    <div class="container">
+        <SectionHeading Id="docs-teaser-title"
+                        Kicker="@L["DocsTeaser.Kicker"]"
+                        Title="@L["DocsTeaser.Title"]"
+                        Lead="@L["DocsTeaser.Lead"]" />
+
+        <div class="docs-grid">
+            @foreach (var manual in _teasers)
+            {
+                <a class="docs-card fintech-card-texture" href="@manual.Href">
+                    <span class="docs-card-cat">@manual.Category</span>
+                    <h3>@manual.Title</h3>
+                    <p>@manual.Summary</p>
+                    <span class="docs-card-meta">@manual.Audience</span>
+                </a>
+            }
+        </div>
+
+        <div class="hero-actions" style="margin-top:1.75rem;">
+            <CtaButton Href="/docs" Variant="secondary">@L["DocsTeaser.All"]</CtaButton>
+            <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
+                @L["Hero.CtaRegister"]
+            </CtaButton>
+        </div>
+    </div>
+</section>
+
+@code {
+    private IReadOnlyList<DocManual> _teasers = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _teasers = await Docs.GetTeasersAsync(3);
+    }
+}

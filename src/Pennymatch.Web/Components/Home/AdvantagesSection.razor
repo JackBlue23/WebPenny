@@ -1,0 +1,33 @@
+@inject ISiteLocalizer L
+
+<section class="section section-dark" id="ventajas" aria-labelledby="adv-title">
+    <div class="container">
+        <SectionHeading Id="adv-title"
+                        Dark="true"
+                        Kicker="@L["Adv.Kicker"]"
+                        Title="@L["Adv.Title"]"
+                        Lead="@L["Adv.Lead"]" />
+
+        <div class="feature-grid cols-3">
+            <article class="feature-block fintech-card-texture reveal">
+                <p class="adv-kicker">@L["Adv.Card1Kicker"]</p>
+                <h3>@L["Adv.Card1Title"]</h3>
+                <p>@L["Adv.Card1Body"]</p>
+            </article>
+            <article class="feature-block fintech-card-texture reveal reveal-delay-1">
+                <p class="adv-kicker">@L["Adv.Card2Kicker"]</p>
+                <h3>@L["Adv.Card2Title"]</h3>
+                <p>@L["Adv.Card2Body"]</p>
+            </article>
+            <article class="feature-block fintech-card-texture reveal reveal-delay-2">
+                <p class="adv-kicker">@L["Adv.Card3Kicker"]</p>
+                <h3>@L["Adv.Card3Title"]</h3>
+                <p>@L["Adv.Card3Body"]</p>
+            </article>
+        </div>
+
+        <p class="adv-disclaimer">
+            @((MarkupString)L["Adv.Disclaimer"])
+        </p>
+    </div>
+</section>

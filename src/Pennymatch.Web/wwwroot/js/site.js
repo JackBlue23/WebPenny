@@ -25,4 +25,274 @@
   authSession.forEach((el) => {
     el.hidden = !hasSession;
   });
+
+  // Language switch: keep pathname/query/hash + scrollY across /culture/set full reload.
+  // Destination is ALWAYS read from window.location at click time — never a stale SSR href.
+  // Hard navigation (location.assign) is required so InteractiveServer islands remount
+  // with the new culture cookie — Blazor enhanced nav alone leaves pricing/sim on the old lang.
+  const LANG_SCROLL_KEY = "penny.lang.scroll";
+  const PRICING_BILLING_KEY = "penny.pricing.billing";
+  const CULTURE_COOKIE = ".AspNetCore.Culture";
+  let pendingScroll = null;
+
+  window.pennyPricingBilling = {
+    save(yearly, currency) {
+      try {
+        sessionStorage.setItem(
+          PRICING_BILLING_KEY,
+          JSON.stringify({
+            yearly: !!yearly,
+            currency: String(currency || "EUR").toUpperCase() === "USD" ? "USD" : "EUR"
+          })
+        );
+      } catch {
+        /* private mode / quota */
+      }
+    },
+    load() {
+      try {
+        return sessionStorage.getItem(PRICING_BILLING_KEY);
+      } catch {
+        return null;
+      }
+    }
+  };
+
+  try {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  } catch {
+    /* ignore */
+  }
+
+  function currentReturnUrl() {
+    // Full path + query + hash from the live browser URL (survives enhanced nav).
+    const relative = location.pathname + location.search + (location.hash || "");
+    return relative && relative.length > 0 ? relative : "/";
+  }
+
+  function buildCultureUrl(culture) {
+    const code = String(culture || "").toLowerCase() === "en" ? "en" : "es";
+    const returnUrl = encodeURIComponent(currentReturnUrl());
+    return `/culture/set?culture=${encodeURIComponent(code)}&returnUrl=${returnUrl}`;
+  }
+
+  /** Drop conflicting culture cookies so /culture/set is the sole source of truth. */
+  function clearCultureCookies() {
+    const expire = "Thu, 01 Jan 1970 00:00:00 GMT";
+    const paths = ["/", location.pathname || "/"];
+    for (const path of paths) {
+      document.cookie = `${CULTURE_COOKIE}=; expires=${expire}; path=${path}`;
+      document.cookie = `${CULTURE_COOKIE}=; Max-Age=0; path=${path}`;
+    }
+  }
+
+  function htmlLang() {
+    return (document.documentElement.lang || "").toLowerCase().split("-")[0];
+  }
+
+  window.pennyLangSwitch = {
+    savePosition() {
+      const data = {
+        path: location.pathname + location.search,
+        hash: location.hash || "",
+        y: window.scrollY || 0
+      };
+      pendingScroll = data;
+      try {
+        sessionStorage.setItem(LANG_SCROLL_KEY, JSON.stringify(data));
+      } catch {
+        /* private mode / quota — culture switch still works without restore */
+      }
+      return data;
+    },
+
+    buildCultureUrl,
+
+    /**
+     * Culture switch built from live location. Prefer plain <a href> navigation;
+     * this helper is for programmatic calls and same-culture menu close.
+     * No _busy flag — never blocks a second click.
+     */
+    switchCulture(culture, options) {
+      const code = String(culture || "").toLowerCase() === "en" ? "en" : "es";
+      const force = !!(options && options.force);
+      const current = htmlLang();
+
+      if (!force && current === code) {
+        this.closeAllSwitchers();
+        return false;
+      }
+
+      try {
+        if ("scrollRestoration" in history) {
+          history.scrollRestoration = "manual";
+        }
+      } catch {
+        /* ignore */
+      }
+
+      this.savePosition();
+      clearCultureCookies();
+      // Full document load so the culture cookie is applied server-side on the next request.
+      window.location.assign(buildCultureUrl(code));
+      return true;
+    },
+
+    closeSwitcher(el) {
+      const root = el && el.closest ? el.closest("[data-lang-switch]") : el;
+      if (root && root.tagName === "DETAILS") {
+        root.open = false;
+      }
+    },
+
+    closeAllSwitchers() {
+      document.querySelectorAll("[data-lang-switch]").forEach((el) => {
+        if (el.tagName === "DETAILS") el.open = false;
+      });
+    },
+
+    restorePosition() {
+      try {
+        if (!pendingScroll) {
+          const raw = sessionStorage.getItem(LANG_SCROLL_KEY);
+          if (!raw) return;
+          pendingScroll = JSON.parse(raw);
+          sessionStorage.removeItem(LANG_SCROLL_KEY);
+        }
+
+        const data = pendingScroll;
+        if (!data) return;
+
+        const here = location.pathname + location.search;
+        if (data.path && data.path !== here) {
+          pendingScroll = null;
+          return;
+        }
+
+        if (data.hash && !location.hash) {
+          history.replaceState(null, "", here + data.hash);
+        }
+
+        const y = Number(data.y);
+        if (!Number.isFinite(y) || y < 0) return;
+
+        const html = document.documentElement;
+        const prev = html.style.scrollBehavior;
+        html.style.scrollBehavior = "auto";
+
+        const apply = () => window.scrollTo(0, y);
+        apply();
+        requestAnimationFrame(() => {
+          apply();
+          setTimeout(() => {
+            apply();
+            html.style.scrollBehavior = prev;
+            pendingScroll = null;
+          }, 60);
+        });
+      } catch {
+        /* ignore corrupt payload */
+      }
+    },
+
+    focusMainHeading() {
+      const heading = document.querySelector("main h1, h1");
+      if (!heading) return;
+      if (!heading.hasAttribute("tabindex")) {
+        heading.setAttribute("tabindex", "-1");
+      }
+      try {
+        heading.focus({ preventScroll: true });
+      } catch {
+        heading.focus();
+      }
+    }
+  };
+
+  /**
+   * Capture-phase for [data-lang-set] anchors/buttons.
+   * - Different culture: rewrite href from live location (pathname+search+hash),
+   *   clear cookies, save scroll, then hard-navigate via location.assign so the
+   *   whole SSR document + InteractiveServer islands remount with the new cookie.
+   *   data-enhance-nav="false" is also set in markup; assign is belt-and-suspenders
+   *   against Blazor soft navigation. Href stays correct for middle-click / no-JS.
+   * - Same culture: preventDefault + close menu only.
+   * No _busy.
+   */
+  document.addEventListener(
+    "click",
+    (event) => {
+      // Modified clicks (new tab / window) keep native <a> behavior.
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
+      const el = event.target?.closest?.("[data-lang-set]");
+      if (!el) {
+        const legacy = event.target?.closest?.("a[data-lang-preserve]");
+        if (!legacy) return;
+        const culture = legacy.getAttribute("hreflang") || legacy.getAttribute("lang") || "es";
+        const code = String(culture).toLowerCase() === "en" ? "en" : "es";
+        if (htmlLang() === code) {
+          event.preventDefault();
+          window.pennyLangSwitch.closeAllSwitchers();
+          return;
+        }
+        window.pennyLangSwitch.savePosition();
+        clearCultureCookies();
+        const url = buildCultureUrl(code);
+        legacy.setAttribute("href", url);
+        event.preventDefault();
+        window.location.assign(url);
+        return;
+      }
+
+      const code = String(el.getAttribute("data-lang-set") || "es").toLowerCase() === "en" ? "en" : "es";
+      if (htmlLang() === code) {
+        event.preventDefault();
+        window.pennyLangSwitch.closeAllSwitchers();
+        return;
+      }
+
+      window.pennyLangSwitch.savePosition();
+      clearCultureCookies();
+      const url = buildCultureUrl(code);
+
+      if (el.tagName === "A") {
+        el.setAttribute("href", url);
+        el.setAttribute("data-enhance-nav", "false");
+      }
+
+      // Hard navigation — full document load applies .AspNetCore.Culture server-side.
+      event.preventDefault();
+      window.location.assign(url);
+    },
+    true
+  );
+
+  // Also refresh hrefs when the menu opens so middle-click / open-in-new-tab stay correct.
+  document.addEventListener(
+    "toggle",
+    (event) => {
+      const root = event.target;
+      if (!root || root.tagName !== "DETAILS" || !root.matches("[data-lang-switch]") || !root.open) {
+        return;
+      }
+      root.querySelectorAll("a[data-lang-set]").forEach((a) => {
+        const code = a.getAttribute("data-lang-set") || "es";
+        a.setAttribute("href", buildCultureUrl(code));
+      });
+    },
+    true
+  );
+
+  window.pennyLangSwitch.restorePosition();
+
+  // Enhanced navigation (in-app links): focus h1 without scrolling; close open lang menus.
+  document.addEventListener("enhancedload", () => {
+    window.pennyLangSwitch.closeAllSwitchers();
+    window.pennyLangSwitch.focusMainHeading();
+  });
 })();

@@ -1,0 +1,69 @@
+@inject ISiteLocalizer L
+@inject NavigationManager Nav
+
+@*
+  Plain GET <a href="/culture/set?..."> so language ALWAYS switches even when
+  site.js is stale/missing or Blazor is down. JS only rewrites returnUrl from
+  live location + saves scroll (see pennyLangSwitch).
+
+  data-enhance-nav="false" is required: Blazor enhanced navigation soft-patches
+  the document after /culture/set and leaves InteractiveServer islands (Pricing,
+  Simulator) + often the chrome on the previous culture until a hard F5.
+*@
+<details class="lang-switch" data-lang-switch>
+    <summary class="lang-switch-summary" aria-label="@L["Lang.Switch"]">
+        <svg class="lang-switch-globe" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M3 12h18" />
+            <path d="M12 3a14 14 0 0 1 0 18" />
+            <path d="M12 3a14 14 0 0 0 0 18" />
+        </svg>
+        <span class="lang-switch-label">@L.Culture.ActiveLabel</span>
+        <svg class="lang-switch-chevron" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6" />
+        </svg>
+    </summary>
+    <div class="lang-switch-menu" role="menu" aria-label="@L["Lang.Switch"]">
+        <a href="@CultureHref("es")"
+           class="lang-switch-option @(L.Culture.Code == "es" ? "is-active" : null)"
+           role="menuitem"
+           lang="es"
+           hreflang="es"
+           data-lang-set="es"
+           data-enhance-nav="false"
+           aria-current="@(L.Culture.Code == "es" ? "true" : null)">@L["Lang.Esp"]</a>
+        <a href="@CultureHref("en")"
+           class="lang-switch-option @(L.Culture.Code == "en" ? "is-active" : null)"
+           role="menuitem"
+           lang="en"
+           hreflang="en"
+           data-lang-set="en"
+           data-enhance-nav="false"
+           aria-current="@(L.Culture.Code == "en" ? "true" : null)">@L["Lang.Eng"]</a>
+    </div>
+</details>
+
+@code {
+    private string CultureHref(string culture)
+    {
+        var relative = "/";
+        try
+        {
+            relative = Nav.ToBaseRelativePath(Nav.Uri);
+            if (string.IsNullOrWhiteSpace(relative))
+            {
+                relative = "/";
+            }
+            else if (!relative.StartsWith('/'))
+            {
+                relative = "/" + relative;
+            }
+        }
+        catch
+        {
+            relative = "/";
+        }
+
+        return $"/culture/set?culture={Uri.EscapeDataString(culture)}&returnUrl={Uri.EscapeDataString(relative)}";
+    }
+}

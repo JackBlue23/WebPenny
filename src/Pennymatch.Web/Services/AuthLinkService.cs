@@ -27,7 +27,15 @@ public sealed class AuthLinkService
         : _options.SessionCookieName;
 
     public string LoginUrl => BuildLoginUrl(includeReturnUrl: true);
-    public string RegisterUrl => Combine(ProductBaseUrl, _options.RegisterPath);
+
+    /// <summary>
+    /// Primary product CTA. Default: http://localhost:5288/login?returnUrl=dashboard
+    /// (avoids blank Client /auth/register until that page ships).
+    /// </summary>
+    public string RegisterUrl => Combine(ProductBaseUrl, string.IsNullOrWhiteSpace(_options.RegisterPath)
+        ? "/login?returnUrl=dashboard"
+        : _options.RegisterPath);
+
     public string DemoUrl => ResolveDemo(_options.DemoPath);
 
     /// <summary>True when DemoUrl leaves the marketing origin (http/mailto).</summary>
@@ -35,19 +43,42 @@ public sealed class AuthLinkService
         DemoUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase)
         || DemoUrl.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Pricing CTA: <c>{ProductBaseUrl}{PricingRegisterPath}?plan=&amp;interval=&amp;currency=</c>.
+    /// </summary>
+    public string BuildPricingRegisterUrl(string plan, bool yearly, string currency)
+    {
+        var path = string.IsNullOrWhiteSpace(_options.PricingRegisterPath)
+            ? "/register"
+            : _options.PricingRegisterPath.Trim();
+
+        var interval = yearly ? "yearly" : "monthly";
+        var planValue = string.IsNullOrWhiteSpace(plan) ? "growth" : plan.Trim().ToLowerInvariant();
+        var currencyValue = string.IsNullOrWhiteSpace(currency)
+            ? "EUR"
+            : currency.Trim().ToUpperInvariant();
+
+        // Path may already include a query (QA fallback). Append with & or ?.
+        var baseUrl = Combine(ProductBaseUrl, path);
+        var separator = baseUrl.Contains('?', StringComparison.Ordinal) ? "&" : "?";
+        return $"{baseUrl}{separator}plan={Uri.EscapeDataString(planValue)}"
+               + $"&interval={Uri.EscapeDataString(interval)}"
+               + $"&currency={Uri.EscapeDataString(currencyValue)}";
+    }
+
     public string BuildLoginUrl(bool includeReturnUrl = true, string? returnUrl = null)
     {
         var path = _options.LoginPath;
         if (string.IsNullOrWhiteSpace(path))
         {
-            path = "/login";
+            path = "/login?returnUrl=dashboard";
         }
 
-        // Support "/login?returnUrl=" style from Client.
+        // Support "/login?returnUrl=" stub and "/login?returnUrl=dashboard" concrete values.
         if (path.Contains("returnUrl=", StringComparison.OrdinalIgnoreCase))
         {
             var baseLogin = Combine(ProductBaseUrl, path);
-            if (!includeReturnUrl)
+            if (!includeReturnUrl || HasConcreteReturnUrl(path))
             {
                 return baseLogin;
             }
@@ -64,7 +95,7 @@ public sealed class AuthLinkService
             return url;
         }
 
-        var ret = returnUrl ?? ResolveMarketingReturnUrl();
+        var ret = returnUrl ?? "dashboard";
         if (string.IsNullOrEmpty(ret))
         {
             return url;
@@ -72,6 +103,26 @@ public sealed class AuthLinkService
 
         var separator = url.Contains('?', StringComparison.Ordinal) ? "&" : "?";
         return $"{url}{separator}returnUrl={Uri.EscapeDataString(ret)}";
+    }
+
+    /// <summary>True when path already supplies a non-empty returnUrl value (not a trailing stub).</summary>
+    private static bool HasConcreteReturnUrl(string path)
+    {
+        var marker = "returnUrl=";
+        var idx = path.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+        if (idx < 0)
+        {
+            return false;
+        }
+
+        var value = path[(idx + marker.Length)..];
+        var amp = value.IndexOf('&');
+        if (amp >= 0)
+        {
+            value = value[..amp];
+        }
+
+        return !string.IsNullOrWhiteSpace(value);
     }
 
     private string? ResolveMarketingReturnUrl()
@@ -90,12 +141,14 @@ public sealed class AuthLinkService
     {
         if (string.IsNullOrWhiteSpace(path) || path == "#")
         {
-            return "#demo";
+            return "/docs";
         }
 
+        // Site-relative manuals / anchors stay on the marketing origin.
         if (path.StartsWith('#')
             || path.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase)
-            || path.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            || path.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+            || path.StartsWith('/'))
         {
             return path;
         }

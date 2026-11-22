@@ -1,125 +1,247 @@
+@rendermode InteractiveServer
 @inject AuthLinkService Auth
+@inject ISiteLocalizer L
+@inject IJSRuntime JS
 
-<section class="section" id="precios" aria-labelledby="pricing-title">
+<section class="section pricing-section" id="precios" aria-labelledby="pricing-title">
     <div class="container">
-        <SectionHeading Kicker="Precios"
-                        Title="Planes para equipos que mueven valor"
-                        Lead="Empieza con el ledger esencial y escala a enterprise con SLA, SSO y soporte dedicado." />
+        <header class="pricing-header">
+            <h2 id="pricing-title" class="pricing-title">@T("Pricing.Title")</h2>
+            <p class="pricing-subtitle">@T("Pricing.TrialNote")</p>
+        </header>
+
+        <div class="pricing-controls" role="group" aria-label="@T("Pricing.BillingAria")">
+            <div class="pricing-segment" role="group" aria-label="@T("Pricing.BillingAria")">
+                <button type="button"
+                        class="pricing-chip @(!_yearly ? "is-active" : null)"
+                        aria-pressed="@(!_yearly)"
+                        @onclick="() => SetYearlyAsync(false)">
+                    @T("Pricing.Monthly")
+                </button>
+                <button type="button"
+                        class="pricing-chip @(_yearly ? "is-active" : null)"
+                        aria-pressed="@_yearly"
+                        @onclick="() => SetYearlyAsync(true)">
+                    @T("Pricing.Yearly")
+                </button>
+                <span class="pricing-save">@T("Pricing.SaveBadge")</span>
+            </div>
+            <div class="pricing-segment" role="group" aria-label="@T("Pricing.CurrencyAria")">
+                <button type="button"
+                        class="pricing-chip @(_currencyUsd ? null : "is-active")"
+                        aria-pressed="@(!_currencyUsd)"
+                        @onclick="() => SetCurrencyUsdAsync(false)">
+                    @T("Pricing.CurrencyEur")
+                </button>
+                <button type="button"
+                        class="pricing-chip @(_currencyUsd ? "is-active" : null)"
+                        aria-pressed="@_currencyUsd"
+                        @onclick="() => SetCurrencyUsdAsync(true)">
+                    @T("Pricing.CurrencyUsd")
+                </button>
+            </div>
+        </div>
 
         <div class="pricing-grid">
             @foreach (var plan in Plans)
             {
-                var href = plan.Highlighted ? Auth.RegisterUrl : Auth.DemoUrl;
-                var external = plan.Highlighted || Auth.DemoOpensExternally;
-                <article class="plan fintech-card-texture @(plan.Highlighted ? "featured" : null)">
-                    <h3 class="plan-name">@plan.Name</h3>
-                    <p class="plan-price">@plan.PriceLabel <span>@plan.Cadence</span></p>
-                    <p>@plan.Summary</p>
-                    <ul class="plan-features">
-                        @foreach (var feature in plan.Features)
+                var href = Auth.BuildPricingRegisterUrl(plan.Id, _yearly, _currencyUsd ? "USD" : "EUR");
+                <article class="plan @(plan.Highlighted ? "featured" : null)">
+                    <div class="plan-top">
+                        @if (plan.Highlighted)
                         {
-                            <li>@feature</li>
+                            <span class="plan-badge">@T("Pricing.Recommended")</span>
                         }
-                    </ul>
-                    <CtaButton Href="@href"
-                               Variant="@(plan.Highlighted ? "primary" : "secondary")"
-                               Target="@(external ? "_blank" : null)"
-                               Rel="@(external ? "noopener noreferrer" : null)">
-                        @plan.CtaLabel
-                    </CtaButton>
+                        <h3 class="plan-name">@T(plan.NameKey)</h3>
+                        <p class="plan-price">
+                            @PriceLabel(plan.Id)
+                            <span>@(_yearly ? T("Pricing.PerYear") : T("Pricing.PerMonth"))</span>
+                        </p>
+                        <p class="plan-summary">@T(plan.SummaryKey)</p>
+                        <ul class="plan-features">
+                            @foreach (var featureKey in plan.FeatureKeys)
+                            {
+                                <li>@T(featureKey)</li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="plan-cta">
+                        <CtaButton Href="@href"
+                                   Variant="@(plan.Highlighted ? "primary" : "secondary")"
+                                   Target="_blank"
+                                   Rel="noopener noreferrer">
+                            @T("Pricing.StartTrial")
+                        </CtaButton>
+                        <p class="plan-trial-hint">@T("Pricing.TrialHint")</p>
+                    </div>
                 </article>
             }
         </div>
-    </div>
-</section>
 
-<section class="section" id="demo" aria-labelledby="demo-title">
-    <div class="container section-panel fintech-card-texture">
-        <SectionHeading Id="demo-title"
-                        Kicker="Demo"
-                        Title="Solicita una demo del ledger en tu stack"
-                        Lead="Cuéntanos tu caso de pagos o liquidaciones. Ajustaremos ProductBaseUrl al puerto real de Pennymatch.Client cuando lo confirméis." />
-        <div class="hero-actions">
-            <CtaButton Href="@Auth.RegisterUrl" Variant="primary" Target="_blank" Rel="noopener noreferrer">
-                Crear cuenta
-            </CtaButton>
-            <CtaButton Href="mailto:demo@pennymatch.com?subject=Solicitar%20demo%20Pennymatch" Variant="secondary">
-                Escribir a ventas
-            </CtaButton>
-        </div>
-    </div>
-</section>
-
-<section class="section" id="docs" aria-labelledby="docs-title">
-    <div class="container">
-        <SectionHeading Kicker="Docs"
-                        Title="Documentación orientada a integración"
-                        Lead="@($"Guías de ledger, webhooks firmados y modelos de autorización. El detalle de endpoints vive en tu entorno de producto. API local: {Auth.ApiBaseUrl}")" />
-        <div class="hero-actions">
-            <CtaButton Href="/blog" Variant="secondary">Leer el blog técnico</CtaButton>
-            <CtaButton Href="@Auth.DemoUrl"
-                       Variant="primary"
-                       Target="@(Auth.DemoOpensExternally ? "_blank" : null)"
-                       Rel="@(Auth.DemoOpensExternally ? "noopener noreferrer" : null)">
-                Hablar con ventas
-            </CtaButton>
-        </div>
+        <p class="pricing-footnote">@T("Pricing.Footnote")</p>
     </div>
 </section>
 
 @code {
-    private static readonly IReadOnlyList<PricingPlan> Plans =
+    /// <summary>
+    /// Baked from SSR parent so Interactive Server keeps ENG/ESP after circuit connect
+    /// (does not rely on ambient CurrentUICulture / scoped SiteLocalizer alone).
+    /// </summary>
+    [Parameter] public string CultureCode { get; set; } = "es";
+
+    private bool _yearly;
+    private bool _currencyUsd;
+    private bool _billingHydrated;
+
+    private UiCulture ActiveCulture => UiCulture.ParseOrDefault(
+        string.IsNullOrWhiteSpace(CultureCode) ? L.Culture.Code : CultureCode);
+
+    private string T(string key) => SiteCatalog.Get(ActiveCulture, key);
+
+    private static readonly PlanCard[] Plans =
     [
-        new()
-        {
-            Id = "starter",
-            Name = "Starter",
-            PriceLabel = "€0",
-            Cadence = "/ mes en sandbox",
-            Summary = "Para prototipar asientos y webhooks en desarrollo.",
-            Features =
-            [
-                "Ledger sandbox",
-                "Hasta 2 tenants de prueba",
-                "Webhooks firmados",
-                "Soporte por comunidad"
-            ],
-            CtaLabel = "Solicitar acceso",
-            Highlighted = false
-        },
-        new()
-        {
-            Id = "pro",
-            Name = "Pro",
-            PriceLabel = "€499",
-            Cadence = "/ mes",
-            Summary = "Producción para fintechs en crecimiento.",
-            Features =
-            [
-                "Ledger en producción",
-                "Tenants ilimitados",
-                "RBAC + auditoría",
-                "SLA 99,9%"
-            ],
-            CtaLabel = "Registrarse",
-            Highlighted = true
-        },
-        new()
-        {
-            Id = "enterprise",
-            Name = "Enterprise",
-            PriceLabel = "A medida",
-            Cadence = "",
-            Summary = "Despliegues exigentes con compliance y soporte 24/7.",
-            Features =
-            [
-                "SSO / SAML",
-                "Residencia de datos",
-                "Soporte dedicado",
-                "Contrato y DPA"
-            ],
-            CtaLabel = "Hablar con ventas",
-            Highlighted = false
-        }
+        new("growth", "Pricing.Growth.Name", "Pricing.Growth.Summary", false,
+        [
+            "Pricing.Growth.F1",
+            "Pricing.Growth.F2",
+            "Pricing.Growth.F3",
+            "Pricing.Growth.F4",
+            "Pricing.Growth.F5"
+        ]),
+        new("pro", "Pricing.Pro.Name", "Pricing.Pro.Summary", true,
+        [
+            "Pricing.Pro.F1",
+            "Pricing.Pro.F2",
+            "Pricing.Pro.F3",
+            "Pricing.Pro.F4",
+            "Pricing.Pro.F5"
+        ]),
+        new("enterprise", "Pricing.Enterprise.Name", "Pricing.Enterprise.Summary", false,
+        [
+            "Pricing.Enterprise.F1",
+            "Pricing.Enterprise.F2",
+            "Pricing.Enterprise.F3",
+            "Pricing.Enterprise.F4",
+            "Pricing.Enterprise.F5"
+        ])
     ];
+
+    protected override void OnInitialized()
+    {
+        ApplyCulture();
+    }
+
+    protected override void OnParametersSet()
+    {
+        ApplyCulture();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _billingHydrated)
+        {
+            return;
+        }
+
+        _billingHydrated = true;
+        try
+        {
+            var raw = await JS.InvokeAsync<string?>("pennyPricingBilling.load");
+            if (!string.IsNullOrWhiteSpace(raw)
+                && raw.Contains('"')
+                && TryParseBilling(raw, out var yearly, out var usd))
+            {
+                _yearly = yearly;
+                _currencyUsd = usd;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (JSException)
+        {
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+
+    private async Task SetYearlyAsync(bool yearly)
+    {
+        _yearly = yearly;
+        await PersistBillingAsync();
+    }
+
+    private async Task SetCurrencyUsdAsync(bool usd)
+    {
+        _currencyUsd = usd;
+        await PersistBillingAsync();
+    }
+
+    private async Task PersistBillingAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync(
+                "pennyPricingBilling.save",
+                _yearly,
+                _currencyUsd ? "USD" : "EUR");
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (JSException)
+        {
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+
+    private void ApplyCulture()
+    {
+        var info = ActiveCulture.ToCultureInfo();
+        System.Globalization.CultureInfo.CurrentCulture = info;
+        System.Globalization.CultureInfo.CurrentUICulture = info;
+    }
+
+    private static bool TryParseBilling(string raw, out bool yearly, out bool usd)
+    {
+        yearly = false;
+        usd = false;
+        // Tiny parser: {"yearly":true,"currency":"USD"} — avoids System.Text.Json dependency in WASM-less SSR island.
+        var y = raw.Contains("\"yearly\":true", StringComparison.OrdinalIgnoreCase)
+                || raw.Contains("\"yearly\": true", StringComparison.OrdinalIgnoreCase);
+        var u = raw.Contains("\"currency\":\"USD\"", StringComparison.OrdinalIgnoreCase)
+                || raw.Contains("\"currency\": \"USD\"", StringComparison.OrdinalIgnoreCase);
+        yearly = y;
+        usd = u;
+        return y || u || raw.Contains("\"yearly\":false", StringComparison.OrdinalIgnoreCase)
+               || raw.Contains("\"currency\":\"EUR\"", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string PriceLabel(string planId) => (planId, _currencyUsd, _yearly) switch
+    {
+        ("growth", false, false) => "79 €",
+        ("growth", true, false) => "$89",
+        ("growth", false, true) => "790 €",
+        ("growth", true, true) => "$890",
+        ("pro", false, false) => "199 €",
+        ("pro", true, false) => "$219",
+        ("pro", false, true) => "1.990 €",
+        ("pro", true, true) => "$2,190",
+        ("enterprise", false, false) => "399 €",
+        ("enterprise", true, false) => "$439",
+        ("enterprise", false, true) => "3.990 €",
+        ("enterprise", true, true) => "$4,390",
+        _ => _currencyUsd ? "$0" : "0 €"
+    };
+
+    private sealed record PlanCard(
+        string Id,
+        string NameKey,
+        string SummaryKey,
+        bool Highlighted,
+        string[] FeatureKeys);
 }

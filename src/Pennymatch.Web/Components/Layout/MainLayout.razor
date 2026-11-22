@@ -10,3 +10,6 @@
 <script>
     document.body.dataset.sessionCookie = @System.Text.Json.JsonSerializer.Serialize(Auth.SessionCookieName ?? "");
 </script>
+
+@* MainLayout scroll hook: interactive island runs OnAfterRenderAsync → pennyLangSwitch.restorePosition. *@
+<LangScrollRestore />
